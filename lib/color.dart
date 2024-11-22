@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 
 // # Gray 색 정의
 Color gray_001 = const Color(0xFFF0F0F0);
-Color gray_002 = const Color(0xFFC3C1C1);
+Color gray_002 = const Color(0xFFCECCCC);
+Color gray_003 = const Color(0xFFC3C1C1);
 
 // # Yellow 색 정의
 Color yellow_001 = const Color(0xFFFFFBE6);
