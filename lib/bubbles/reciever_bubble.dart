@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:foofi/color.dart';
 
 /// 선택 버튼 class
-class RecieverBubble extends StatelessWidget {
-  RecieverBubble({
+class SenderBubble extends StatelessWidget {
+  SenderBubble({
     super.key,
     required this.text,
   });

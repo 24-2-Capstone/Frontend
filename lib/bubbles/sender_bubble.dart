@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:foofi/color.dart';
 
 /// 선택 버튼 class
-class SenderBubble extends StatelessWidget {
-  SenderBubble({
+class ReceiverBubble extends StatelessWidget {
+  ReceiverBubble({
     super.key,
     required this.text,
   });
@@ -16,6 +16,9 @@ class SenderBubble extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.start,
       children: [
         Container(
+          constraints: BoxConstraints(
+            maxWidth: MediaQuery.of(context).size.width * 0.8, // 최대 너비 설정
+          ),
           decoration: BoxDecoration(
             color: yellow_002,
             borderRadius: BorderRadius.circular(30),

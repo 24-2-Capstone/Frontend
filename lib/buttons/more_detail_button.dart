@@ -29,7 +29,91 @@ class _MoreDetailButtonState extends State<MoreDetailButton> {
           splashColor: green_002,
           highlightColor: Colors.transparent,
           borderRadius: BorderRadius.circular(20),
-          onTap: widget.onTap,
+          //onTap: widget.onTap,
+          onTap: () {
+            showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                final double height = MediaQuery.of(context).size.height / 852;
+                final double width = MediaQuery.of(context).size.width / 393;
+
+                return Dialog(
+                  insetPadding: EdgeInsets.symmetric(
+                      vertical: 130.0 * height, horizontal: 24.0 * width),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: yellow_002,
+                      borderRadius: BorderRadius.circular(20.0),
+                    ),
+                    child: Stack(
+                      children: [
+                        Positioned(
+                          right: 12.0,
+                          top: 12.0,
+                          child: IconButton(
+                            padding: const EdgeInsets.all(0.0),
+                            onPressed: () {
+                              Navigator.pop(context);
+                            },
+                            icon: const Icon(
+                              Icons.cancel,
+                            ),
+                          ),
+                        ),
+                        Column(
+                          children: [
+                            SizedBox(
+                              height: 34 * width,
+                            ),
+                            const Text(
+                              '상품명',
+                              style: TextStyle(
+                                color: Colors.black,
+                                fontSize: 20.0,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            Divider(
+                              thickness: 2,
+                              color: brown_001.withOpacity(0.7),
+                              indent: 50.0,
+                              endIndent: 50.0,
+                            ),
+                            Expanded(
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 28.0),
+                                child: GridView.builder(
+                                  gridDelegate:
+                                      const SliverGridDelegateWithFixedCrossAxisCount(
+                                    crossAxisCount: 2,
+                                    crossAxisSpacing: 15,
+                                    mainAxisSpacing: 15,
+                                    childAspectRatio: 1 / 1.3,
+                                  ),
+                                  itemCount: 3,
+                                  itemBuilder:
+                                      (BuildContext context, int index) {
+                                    return GestureDetector(
+                                        child: Column(
+                                      children: [
+                                        Container(),
+                                        const Text('ooo 사과')
+                                      ],
+                                    ));
+                                  },
+                                ),
+                              ),
+                            )
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              },
+            );
+          },
           onHighlightChanged: (isHightlighted) {
             setState(() {
               buttonTextColor = isHightlighted ? green_001 : Colors.black;

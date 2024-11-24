@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:foofi/screens/chatting_screen.dart';
 import 'package:foofi/color.dart';
+import 'package:foofi/screens/search_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -97,7 +98,7 @@ class HomeScreen extends StatelessWidget {
                             context,
                             MaterialPageRoute<void>(
                               builder: (BuildContext context) =>
-                                  const ChattingScreen(),
+                                  const SearchScreen(),
                             ),
                           );
                         },
