@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:foofi/bubbles/receiver_image_bubble.dart';
 import 'package:foofi/color.dart';
 
 class SearchScreen extends StatefulWidget {
@@ -23,6 +24,15 @@ class _SearchScreenState extends State<SearchScreen> {
         leading: const Icon(
           Icons.menu,
         ),
+      ),
+      body: Column(
+        children: [
+          Center(
+            child: ReceiverImageBubble(
+              text: '조회된 사과 목록입니다.',
+            ),
+          )
+        ],
       ),
     );
   }

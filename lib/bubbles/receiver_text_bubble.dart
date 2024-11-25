@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:foofi/color.dart';
 
-/// 선택 버튼 class
-class ReceiverBubble extends StatelessWidget {
-  ReceiverBubble({
+/// ai 텍스트 말풍선 class
+class ReceiverTextBubble extends StatelessWidget {
+  ReceiverTextBubble({
     super.key,
     required this.text,
   });

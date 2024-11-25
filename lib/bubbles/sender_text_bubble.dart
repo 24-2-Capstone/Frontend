@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:foofi/color.dart';
 
-/// 선택 버튼 class
-class SenderBubble extends StatelessWidget {
-  SenderBubble({
+/// User text 말풍선 class
+class SenderTextBubble extends StatelessWidget {
+  SenderTextBubble({
     super.key,
     required this.text,
   });
