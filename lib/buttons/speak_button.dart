@@ -33,7 +33,7 @@ class SpeakButton extends StatelessWidget {
               border: isRecording
                   ? Border.all(style: BorderStyle.none)
                   : Border.all(
-                      color: green_002.withOpacity(0.3),
+                      color: green_003.withOpacity(0.3),
                       width: 3.0,
                       strokeAlign: BorderSide.strokeAlignCenter,
                     ),

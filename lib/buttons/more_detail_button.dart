@@ -26,7 +26,7 @@ class _MoreDetailButtonState extends State<MoreDetailButton> {
         surfaceTintColor: Colors.transparent,
         elevation: 0,
         child: InkWell(
-          splashColor: green_002,
+          splashColor: green_003,
           highlightColor: Colors.transparent,
           borderRadius: BorderRadius.circular(20),
           //onTap: widget.onTap,
@@ -73,11 +73,14 @@ class _MoreDetailButtonState extends State<MoreDetailButton> {
                                 fontWeight: FontWeight.w600,
                               ),
                             ),
-                            Divider(
-                              thickness: 2,
-                              color: brown_001.withOpacity(0.7),
-                              indent: 50.0,
-                              endIndent: 50.0,
+                            Padding(
+                              padding: const EdgeInsets.only(bottom: 16.0),
+                              child: Divider(
+                                thickness: 2,
+                                color: brown_001.withOpacity(0.7),
+                                indent: 50.0,
+                                endIndent: 50.0,
+                              ),
                             ),
                             Expanded(
                               child: Padding(
@@ -95,16 +98,38 @@ class _MoreDetailButtonState extends State<MoreDetailButton> {
                                   itemBuilder:
                                       (BuildContext context, int index) {
                                     return GestureDetector(
-                                        child: Column(
-                                      children: [
-                                        Container(),
-                                        const Text('ooo 사과')
-                                      ],
-                                    ));
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.center,
+                                        children: [
+                                          Image.asset(
+                                            "assets/images/flower.jpg",
+                                            height: 128,
+                                          ),
+                                          const Padding(
+                                            padding: EdgeInsets.only(top: 5.0),
+                                            child: Text(
+                                              '이름이름이름',
+                                              style: TextStyle(
+                                                  color: Colors.black,
+                                                  fontSize: 11,
+                                                  fontWeight: FontWeight.w400),
+                                            ),
+                                          ),
+                                          const Text(
+                                            '가격가격가격',
+                                            style: TextStyle(
+                                                color: Colors.black,
+                                                fontSize: 13,
+                                                fontWeight: FontWeight.w600),
+                                          ),
+                                        ],
+                                      ),
+                                    );
                                   },
                                 ),
                               ),
-                            )
+                            ),
                           ],
                         ),
                       ],
@@ -123,7 +148,7 @@ class _MoreDetailButtonState extends State<MoreDetailButton> {
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(20),
               border: Border.all(
-                color: green_002.withOpacity(0.3),
+                color: green_003.withOpacity(0.3),
                 width: 3.0,
                 strokeAlign: BorderSide.strokeAlignCenter,
               ),

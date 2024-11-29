@@ -12,7 +12,11 @@ Color yellow_003 = const Color(0xFFDAB900);
 
 // # Green 색 정의
 Color green_001 = const Color(0xFFD5ED9F);
-Color green_002 = const Color(0xFF00712D);
+Color green_002 = const Color(0xFF43C33A);
+Color green_003 = const Color(0xFF00712D);
 
 // # Brown 색 정의
 Color brown_001 = const Color(0xFF532B18);
+
+// # Orange 색 정의
+Color orange_001 = const Color(0xFFFE7C0A);

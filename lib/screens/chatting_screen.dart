@@ -5,6 +5,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_sound/public/flutter_sound_recorder.dart';
+import 'package:foofi/bubbles/receiver_image_bubble.dart';
 import 'package:foofi/bubbles/sender_image_bubble.dart';
 import 'package:foofi/bubbles/sender_text_bubble.dart';
 import 'package:foofi/bubbles/receiver_text_bubble.dart';
@@ -12,12 +13,12 @@ import 'package:foofi/buttons/choice_button.dart';
 import 'package:foofi/buttons/more_detail_button.dart';
 import 'package:foofi/buttons/speak_button.dart';
 import 'package:foofi/color.dart';
+import 'package:foofi/function/perform_stt.dart';
 import 'package:foofi/main.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:speech_to_text/speech_to_text.dart' as stt;
 
 class ChattingScreen extends StatefulWidget {
   const ChattingScreen({super.key});
@@ -28,7 +29,7 @@ class ChattingScreen extends StatefulWidget {
 
 class _ChattingScreenState extends State<ChattingScreen> {
   List<String> choices = ["사진", "끝내기"];
-  bool _isSpeechInitialized = false; // SpeechToText 초기화 여부
+  final bool _isSpeechInitialized = false; // SpeechToText 초기화 여부
 
   final List<Widget> _messages = []; // 채팅 메시지 리스트
 
@@ -38,9 +39,9 @@ class _ChattingScreenState extends State<ChattingScreen> {
   String? _recordedFilePath;
 
   // STT 관련 변수 정의
-  final stt.SpeechToText _speechToText = stt.SpeechToText();
   String _text = "음성을 입력하세요!";
   String _reply = ""; // ReceiverBubble에 띄울 reply
+  List<Map<dynamic, dynamic>> _detailedResult = [];
 
   // 이미지 업로드 관련 변수 정의
   final ImagePicker _picker = ImagePicker();
@@ -53,7 +54,6 @@ class _ChattingScreenState extends State<ChattingScreen> {
   void initState() {
     super.initState();
     _initializeRecorder();
-    _initializeSpeechToText();
     _scrollController = ScrollController();
   }
 
@@ -75,39 +75,49 @@ class _ChattingScreenState extends State<ChattingScreen> {
     if (_isRecording) {
       // 녹음 중이면 중단
       await _stopRecording();
-      // 녹음 중단 후 POST 요청 보내기
-      await _sendTextPostRequest();
+      final file = File(_recordedFilePath!);
+      if (await file.exists()) {
+        final fileBytes = await file.readAsBytes();
+        print("녹음된 오디오 크기: ${fileBytes.length} bytes");
+      }
+
+      String? recognizedText = await performSTT(_recordedFilePath!);
+      print(recognizedText);
+
+      if (recognizedText != null && recognizedText.isNotEmpty) {
+        setState(() {
+          _text = recognizedText; // _text에 음성 인식 결과 저장
+        });
+
+        // 녹음 중단 후 POST 요청 보내기
+        await _sendTextPostRequest();
+      } else {
+        print("음성 인식에 실패했습니다.");
+        showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return const AlertDialog(
+                title: Text('음성 인식에 실패했습니다.'),
+              );
+            });
+      }
     } else {
       // 녹음 시작
       await _startRecording();
     }
   }
 
-  /// SpeechToText 초기화 함수
-  Future<void> _initializeSpeechToText() async {
-    bool available = await _speechToText.initialize();
-    if (available) {
-      setState(() {
-        _isSpeechInitialized = true; // 초기화 완료 표시
-        _text = "음성을 입력하세요";
-      });
-    } else {
-      setState(() {
-        _isSpeechInitialized = false; // 초기화 실패 표시
-        _text = "음성 인식 기능을 사용할 수 없습니다.";
-      });
-    }
-  }
-
   /// Recoding 시작 함수
   Future<void> _startRecording() async {
     // 경로 지정 (예시: 앱의 로컬 디렉토리에 저장)
-    String path = await _getFilePath();
+    _recordedFilePath = await _getFilePath();
+    print(_recordedFilePath);
 
     try {
       // 파일 경로를 지정하여 녹음 시작
       await _recorder.startRecorder(
-        toFile: path, // 경로를 지정
+        toFile: _recordedFilePath, // 경로를 지정
+        sampleRate: 16000, // 샘플링 주파수 16000Hz 설정
       );
 
       _recorder.setSubscriptionDuration(const Duration(milliseconds: 100));
@@ -115,19 +125,15 @@ class _ChattingScreenState extends State<ChattingScreen> {
       setState(() {
         _isRecording = true;
       });
-
-      // 음성 인식 시작
-      if (_isSpeechInitialized) {
-        _startListening(); // 음성 인식 시작
-      } else {
-        setState(() {
-          _text = "음성 인식 초기화 실패";
-        });
-      }
     } catch (e) {
-      setState(() {
-        _text = "녹음 시작 실패: $e";
-      });
+      showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: const Text('녹음에 실패하였습니다!'),
+              content: Text('$e'),
+            );
+          });
     }
   }
 
@@ -138,33 +144,26 @@ class _ChattingScreenState extends State<ChattingScreen> {
 
   /// Recoding 중지 함수
   Future<void> _stopRecording() async {
+    final filePath = _recordedFilePath;
+    if (filePath != null && File(filePath).existsSync()) {
+      final file = File(filePath);
+      final fileLength = await file.length();
+
+      if (fileLength == 0) {
+        print("녹음이 제대로 되지 않았습니다. 파일이 비어있습니다.");
+        return;
+      }
+
+      print("녹음이 완료되었습니다: $filePath");
+    } else {
+      print("파일이 생성되지 않았습니다.");
+      return;
+    }
+
     await _recorder.stopRecorder();
     setState(() {
       _isRecording = false;
     });
-
-    // 음성 인식 중지
-    _stopListening();
-  }
-
-  /// 음성 인식 시작
-  void _startListening() {
-    _speechToText.listen(
-      onResult: (result) {
-        setState(() {
-          _text = result.recognizedWords; // 음성 인식 결과를 텍스트로 업데이트
-        });
-      },
-      listenFor: const Duration(seconds: 30), // 음성 인식 대기 시간 설정
-      pauseFor: const Duration(seconds: 3), // 말하기 중 잠시 멈췄을 때 대기 시간
-      partialResults: true, // 중간 결과를 받도록 설정
-      localeId: 'ko_KR', // 언어 설정 (한국어로 설정)
-    );
-  }
-
-  // 음성 인식 중지
-  void _stopListening() {
-    _speechToText.stop();
   }
 
   // POST 요청 메서드
@@ -190,17 +189,35 @@ class _ChattingScreenState extends State<ChattingScreen> {
         // 요청 성공 시 처리
         final Map<String, dynamic> responseData = jsonDecode(response.body);
         final String reply = responseData['reply'] ?? '';
+        // detailed_results가 null인 경우 빈 리스트로 초기화
+        final List<Map<String, dynamic>> detailedResults =
+            (responseData['detailed_results'] as List<dynamic>?)
+                    ?.cast<Map<String, dynamic>>() ??
+                [];
+        print(detailedResults);
 
         setState(() {
           _reply = reply; // 서버에서 받은 reply를 업데이트
+          _detailedResult = detailedResults; // 서버에서 받은 detail을 업데이트
 
           // 메시지 리스트에 추가
           _messages.add(SenderTextBubble(text: _text));
           _messages.add(const SizedBox(height: 14.0));
-          _scrollToBottom(); // 서버 응답 메시지 추가 시 스크롤s
+          _scrollToBottom(); // 서버 응답 메시지 추가 시 스크롤
 
-          _messages.add(ReceiverTextBubble(text: _reply));
-          _messages.add(const SizedBox(height: 14.0));
+          if (_detailedResult.isEmpty) {
+            _messages.add(ReceiverTextBubble(text: _reply));
+            _messages.add(const SizedBox(height: 14.0));
+          } else {
+            _messages.add(ReceiverImageBubble(
+              text: '조회된 사과 목록입니다.',
+              name: _detailedResult[0]['product_name'],
+              imageUrl: _detailedResult[0]['image_url'],
+              originalPrice: _detailedResult[0]['original_price'],
+              discountPrice: _detailedResult[0]['discount_price'],
+            ));
+            _messages.add(const SizedBox(height: 14.0));
+          }
           _scrollToBottom(); // 서버 응답 메시지 추가 시 스크롤
         });
 
@@ -289,7 +306,7 @@ class _ChattingScreenState extends State<ChattingScreen> {
       if (_scrollController.hasClients) {
         _scrollController.animateTo(
           _scrollController.position.maxScrollExtent,
-          duration: const Duration(milliseconds: 300),
+          duration: const Duration(seconds: 5),
           curve: Curves.easeOut,
         );
       }
