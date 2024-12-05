@@ -123,6 +123,27 @@ class _ChattingScreenState extends State<ChattingScreen> {
         _isRecording = false;
         _sttResult = "녹음 중 오류 발생: $e";
       });
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            backgroundColor: yellow_001,
+            title: const Text(
+              "오류",
+              style: TextStyle(color: Colors.red),
+            ),
+            content: const Text('다시 한 번 말씀해주세요.'),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: const Text("닫기"),
+              ),
+            ],
+          );
+        },
+      );
     }
   }
 
@@ -158,56 +179,20 @@ class _ChattingScreenState extends State<ChattingScreen> {
       setState(() {
         _text = response.body;
       });
+      if (!_text.contains('fail')) {
+        _messages.add(SenderTextBubble(text: response.body));
 
-      if (response.statusCode == 202 || response.statusCode == 200) {
+        _messages.add(SizedBox(height: 14.h));
+        _scrollToBottom();
+        _sendTextPostRequest();
+      } else if (_text.contains('위치') || _text.contains('어디')) {}
+
+      if (response.statusCode == 200) {
         final jsonResponse = jsonDecode(response.body);
-        // 오류 처리
-        if (response.body ==
-                "neuron_execution_fail:sub_neuron_return_nothing,rcz-kor-base-base64,0" ||
-            response.body ==
-                "FormatException: Unexpected character (at character 1)") {
-          setState(() {
-            _sttResult = jsonDecode(response.body);
-            showDialog(
-              context: context,
-              builder: (BuildContext buildContext) {
-                return Dialog(
-                  // insetPadding: EdgeInsets.symmetric(
-                  //     vertical: 90.0.h, horizontal: 24.0.w),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: yellow_002,
-                      borderRadius: BorderRadius.circular(20.0.r),
-                    ),
-                    child: const Text('다시 한 번 입력해주세요.'),
-                  ),
-                );
-              },
-            );
-          });
-        } else {
-          // 정상적으로 요청
-          setState(() {
-            _sttResult = jsonDecode(response.body);
-            _messages.add(SenderTextBubble(text: response.body));
-            _messages.add(SizedBox(height: 14.h));
-            _scrollToBottom();
-
-            // 위치 관련 질문 처리
-            if (response.body.contains('위치') || response.body.contains('어디')) {
-              // replaceAll을 사용하여 '위치' 나 '어디' 를 빈 문자열로 교체
-              List<String> wordsToRemove = ["위치", "어디"];
-
-              // 정규 표현식을 이용해서 여러 단어 제거
-              for (var word in wordsToRemove) {
-                _text = response.body.replaceAll(word, "");
-              }
-              _sendTextPostRequest(1);
-            } else {
-              _sendTextPostRequest(0);
-            }
-          });
-        }
+        setState(() {
+          //_sttResult = jsonResponse["text"] ?? "결과 없음";
+          _sttResult = jsonDecode(response.body);
+        });
       } else {
         print("STT 요청 실패: ${response.statusCode}, ${response.body}");
         setState(() {
@@ -216,36 +201,6 @@ class _ChattingScreenState extends State<ChattingScreen> {
       }
     } catch (e) {
       print("STT 요청 중 오류 발생: $e");
-      showDialog(
-        context: context,
-        builder: (BuildContext buildContext) {
-          return AlertDialog(
-            backgroundColor: yellow_002,
-            title: const Text(
-              "오류",
-              style: TextStyle(color: Colors.red),
-            ),
-            content: Text(
-              '다시 한 번 말해주세요.',
-              style: TextStyle(
-                  color: brown_001,
-                  fontWeight: FontWeight.w500,
-                  fontSize: 18.h),
-            ),
-            actions: [
-              TextButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-                child: Text(
-                  "확인",
-                  style: TextStyle(color: brown_001),
-                ),
-              ),
-            ],
-          );
-        },
-      );
       setState(() {
         _sttResult = "오류 발생: $e";
       });
@@ -253,7 +208,7 @@ class _ChattingScreenState extends State<ChattingScreen> {
   }
 
   // POST 요청 메서드
-  Future<void> _sendTextPostRequest(int command) async {
+  Future<void> _sendTextPostRequest() async {
     if (_text.isEmpty) {
       print('음성 인식 결과가 없습니다 !!');
       return;
@@ -264,6 +219,14 @@ class _ChattingScreenState extends State<ChattingScreen> {
       _isLoading = true;
       _messages.add(const ReceiverLoadingBubble());
       _scrollToBottom(); // 스크롤을 가장 아래로 이동
+      if (_text.contains('위치') || _text.contains('어디')) {
+        List<String> wordsToRemove = ["위치", "어디"];
+
+        // 정규 표현식을 이용해서 여러 단어 제거
+        for (var word in wordsToRemove) {
+          _text = _text.replaceAll(word, " ");
+        }
+      }
     });
 
     // URL과 요청 데이터를 정의
@@ -294,10 +257,6 @@ class _ChattingScreenState extends State<ChattingScreen> {
           await playAudio(filePath);
         }
 
-        // 이름으로 id 저장
-        Map<String, dynamic> firstgoods =
-            await getRequestGoodsName(_detailedResult[0]['product_name']);
-
         setState(() {
           _reply = reply; // 서버에서 받은 reply를 업데이트
           _detailedResult = detailedResults; // 서버에서 받은 detail을 업데이트
@@ -309,26 +268,17 @@ class _ChattingScreenState extends State<ChattingScreen> {
             _messages.add(ReceiverTextBubble(text: _reply));
             _messages.add(SizedBox(height: 14.0.h));
           } else {
-            if (command == 0) {
-              // 일반 상품 추천 질문에 대한 답변
-              _messages.add(ReceiverImageBubble(
-                text: reply,
-                name: _detailedResult[0]['product_name'],
-                imageUrl: _detailedResult[0]['image_url'],
-                imageUrl1: _detailedResult[1]['image_url'],
-                imageUrl2: _detailedResult[2]['image_url'],
-                originalPrice: _detailedResult[0]['original_price'] ?? 0,
-                discountPrice: _detailedResult[0]['discount_price'] ?? 0,
-                detailedList: responseData["detailed_results"],
-              ));
-            } else if (command == 1) {
-              // 위치 질문에 대한 답변
-              _messages.add(ReceiverMapBubble(
-                text: '요청하신 상품의 위치입니다!',
-                name: _detailedResult[0]['product_name'],
-                id: firstgoods['id'],
-              ));
-            }
+            _messages.add(ReceiverImageBubble(
+              //text: '조회된 상품 목록입니다.',
+              text: reply,
+              name: _detailedResult[0]['product_name'],
+              imageUrl: _detailedResult[0]['image_url'],
+              imageUrl1: _detailedResult[1]['image_url'],
+              imageUrl2: _detailedResult[2]['image_url'],
+              originalPrice: _detailedResult[0]['original_price'] ?? 0,
+              discountPrice: _detailedResult[0]['discount_price'] ?? 0,
+              detailedList: responseData["detailed_results"],
+            ));
             _messages.add(SizedBox(height: 14.0.h));
           }
           _scrollToBottom(); // 서버 응답 메시지 추가 시 스크롤
@@ -345,6 +295,27 @@ class _ChattingScreenState extends State<ChattingScreen> {
       // 네트워크 오류 등 예외 처리
       print('POST 요청 오류: $error');
       print(_text);
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            backgroundColor: yellow_001,
+            title: const Text(
+              "오류",
+              style: TextStyle(color: Colors.red),
+            ),
+            content: const Text('다시 한 번 말씀해주세요.'),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: const Text("닫기"),
+              ),
+            ],
+          );
+        },
+      );
     } finally {
       setState(() {
         _isLoading = false; // 로딩 상태 해제
@@ -374,7 +345,6 @@ class _ChattingScreenState extends State<ChattingScreen> {
 
     if (image != null) {
       setState(() {
-        _isLoading = true;
         _pickedImages = [image]; // 선택된 이미지를 리스트에 저장
 
         // 채팅 메시지에 이미지 추가
@@ -477,38 +447,32 @@ class _ChattingScreenState extends State<ChattingScreen> {
         _isRecording = false;
         _sttResult = "녹음 중 오류 발생: $e";
       });
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            backgroundColor: yellow_001,
+            title: const Text(
+              "오류",
+              style: TextStyle(color: Colors.red),
+            ),
+            content: const Text('다시 한 번 말씀해주세요.'),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: const Text("닫기"),
+              ),
+            ],
+          );
+        },
+      );
       print('이미지 처리 또는 POST 요청 오류: $e');
     } finally {
       setState(() {
         _isLoading = false; // 로딩 상태 해제
       });
-    }
-  }
-
-  /// 이름으로 상품 검색
-  Future<Map<String, dynamic>> getRequestGoodsName(String name) async {
-    final String baseUrl = "$back_url/goods/search/name";
-
-    try {
-      // 파라미터 name으로 추가
-      final Uri uri =
-          Uri.parse(baseUrl).replace(queryParameters: {'goods_name': name});
-      final http.Response response = await http.get(uri);
-      print(response.statusCode);
-      if (response.statusCode == 200) {
-        // 바이트 기반으로 UTF-8 디코딩 처리
-        final String decodedBody = utf8.decode(response.bodyBytes);
-        print("디코딩된 응답 본문: $decodedBody");
-        return jsonDecode(decodedBody)['result'];
-      } else {
-        return {
-          "isSuccess": false,
-          "code": response.statusCode,
-          "message": "요청 실패: ${response.reasonPhrase}"
-        };
-      }
-    } catch (e) {
-      return {"isSuccess": false, "code": 500, "message": "오류 발생: $e"};
     }
   }
 
@@ -595,7 +559,7 @@ class _ChattingScreenState extends State<ChattingScreen> {
                                             text: '맛있는 사과를 추천해줘'));
                                         _messages.add(SizedBox(height: 14.h));
                                         _text = '맛있는 사과를 추천해줘';
-                                        _sendTextPostRequest(0);
+                                        _sendTextPostRequest();
                                       });
                                     },
                                     text: "맛있는 사과를\n추천해줘"),
@@ -617,19 +581,7 @@ class _ChattingScreenState extends State<ChattingScreen> {
                                           await performTTS('계산대의 위치입니다!');
 
                                       if (filePath != null) {
-                                        setState(() {
-                                          _messages.add(
-                                              const ReceiverLoadingBubble());
-                                        });
-
-                                        await Future.delayed(
-                                            const Duration(seconds: 1));
-                                        setState(() {
-                                          _messages.remove(_messages.last);
-                                        });
-
                                         await playAudio(filePath);
-
                                         setState(() {
                                           _messages.add(
                                             ReceiverCashierMapBubble(
