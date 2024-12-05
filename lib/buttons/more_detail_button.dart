@@ -3,6 +3,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:foofi/color.dart';
 import 'package:foofi/function/show_goods_dialog.dart';
+import 'package:intl/intl.dart';
 
 /// 더보기 버튼 class
 class MoreDetailButton extends StatefulWidget {
@@ -35,6 +36,8 @@ class _MoreDetailButtonState extends State<MoreDetailButton> {
 
   @override
   Widget build(BuildContext context) {
+    NumberFormat currencyFormat = NumberFormat('#,###');
+
     return GestureDetector(
       onTap: widget.onTap,
       child: Material(
@@ -53,19 +56,19 @@ class _MoreDetailButtonState extends State<MoreDetailButton> {
               builder: (BuildContext context) {
                 return Dialog(
                   insetPadding: EdgeInsets.symmetric(
-                      vertical: 130.0.h, horizontal: 24.0.w),
+                      vertical: 100.0.h, horizontal: 24.0.w),
                   child: Container(
                     decoration: BoxDecoration(
                       color: yellow_002,
-                      borderRadius: BorderRadius.circular(20.0),
+                      borderRadius: BorderRadius.circular(20.0.r),
                     ),
                     child: Stack(
                       children: [
                         Positioned(
-                          right: 12.0,
-                          top: 12.0,
+                          right: 12.0.w,
+                          top: 12.0.h,
                           child: IconButton(
-                            padding: const EdgeInsets.all(0.0),
+                            padding: EdgeInsets.all(0.0.w),
                             onPressed: () {
                               Navigator.pop(context);
                             },
@@ -79,33 +82,33 @@ class _MoreDetailButtonState extends State<MoreDetailButton> {
                             SizedBox(
                               height: 34.w,
                             ),
-                            const Text(
+                            Text(
                               '상품',
                               style: TextStyle(
                                 color: Colors.black,
-                                fontSize: 20.0,
+                                fontSize: 20.0.h,
                                 fontWeight: FontWeight.w600,
                               ),
                             ),
                             Padding(
-                              padding: const EdgeInsets.only(bottom: 16.0),
+                              padding: EdgeInsets.only(bottom: 16.0.h),
                               child: Divider(
-                                thickness: 2,
+                                thickness: 2.h,
                                 color: brown_001.withOpacity(0.7),
-                                indent: 50.0,
-                                endIndent: 50.0,
+                                indent: 50.0.w,
+                                endIndent: 50.0.w,
                               ),
                             ),
                             Expanded(
                               child: Padding(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 28.0),
+                                padding:
+                                    EdgeInsets.symmetric(horizontal: 28.0.w),
                                 child: GridView.builder(
                                   gridDelegate:
-                                      const SliverGridDelegateWithFixedCrossAxisCount(
+                                      SliverGridDelegateWithFixedCrossAxisCount(
                                     crossAxisCount: 2,
-                                    crossAxisSpacing: 15,
-                                    mainAxisSpacing: 15,
+                                    crossAxisSpacing: 15.w,
+                                    mainAxisSpacing: 15.h,
                                     childAspectRatio: 1 / 1.5,
                                   ),
                                   itemCount: widget.detailedList.length,
@@ -155,9 +158,9 @@ class _MoreDetailButtonState extends State<MoreDetailButton> {
                                               widget.detailedList[index]
                                                   ['product_name'],
                                               textAlign: TextAlign.center,
-                                              style: const TextStyle(
+                                              style: TextStyle(
                                                 color: Colors.black,
-                                                fontSize: 11,
+                                                fontSize: 11.h,
                                                 fontWeight: FontWeight.w400,
                                               ),
                                               overflow: TextOverflow
@@ -171,7 +174,8 @@ class _MoreDetailButtonState extends State<MoreDetailButton> {
                                                 mainAxisAlignment:
                                                     MainAxisAlignment.center,
                                                 children: [
-                                                  if (discountRate != 0)
+                                                  if (discountRate != 0 ||
+                                                      discountRate != 100)
                                                     Text(
                                                       '${discountRate.toStringAsFixed(0)}% ',
                                                       style: TextStyle(
@@ -185,7 +189,7 @@ class _MoreDetailButtonState extends State<MoreDetailButton> {
                                                       ),
                                                     ),
                                                   Text(
-                                                    '${widget.detailedList[index]['discount_price']}원 ',
+                                                    '${currencyFormat.format(widget.detailedList[index]['discount_price'])}원 ',
                                                     style: TextStyle(
                                                         color: brown_001,
                                                         fontSize: 15.w,
@@ -195,7 +199,7 @@ class _MoreDetailButtonState extends State<MoreDetailButton> {
                                                 ],
                                               ),
                                               Text(
-                                                '${widget.detailedList[index]['original_price']}원 ',
+                                                '${currencyFormat.format(widget.detailedList[index]['original_price'])}원 ',
                                                 style: TextStyle(
                                                     color:
                                                         const Color(0xFF707070),
@@ -230,20 +234,20 @@ class _MoreDetailButtonState extends State<MoreDetailButton> {
           },
           child: Container(
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(20),
+              borderRadius: BorderRadius.circular(20.r),
               border: Border.all(
                 color: green_003.withOpacity(0.3),
-                width: 3.0,
+                width: 3.0.w,
                 strokeAlign: BorderSide.strokeAlignCenter,
               ),
             ),
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+              padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 5.h),
               child: Text(
                 "더 보기",
                 style: TextStyle(
                   color: buttonTextColor,
-                  fontSize: 10,
+                  fontSize: 10.h,
                   fontWeight: FontWeight.w500,
                 ),
               ),
