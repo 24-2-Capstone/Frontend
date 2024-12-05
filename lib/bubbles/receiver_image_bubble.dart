@@ -4,6 +4,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:foofi/buttons/more_detail_button.dart';
 import 'package:foofi/color.dart';
+import 'package:intl/intl.dart';
 
 /// ai 텍스트 말풍선 class
 class ReceiverImageBubble extends StatelessWidget {
@@ -31,6 +32,7 @@ class ReceiverImageBubble extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     double discountRate = 100 - discountPrice / originalPrice * 100;
+    NumberFormat currencyFormat = NumberFormat('#,###');
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.start,
@@ -86,14 +88,14 @@ class ReceiverImageBubble extends StatelessWidget {
                               fontWeight: FontWeight.w600),
                         ),
                         TextSpan(
-                          text: '$discountPrice원 ',
+                          text: '${currencyFormat.format(discountPrice)}원 ',
                           style: TextStyle(
                               color: brown_001,
                               fontSize: 20,
                               fontWeight: FontWeight.w600),
                         ),
                         TextSpan(
-                          text: '$originalPrice원',
+                          text: '${currencyFormat.format(originalPrice)}원 ',
                           style: const TextStyle(
                               color: Color(0xFF707070),
                               decoration: TextDecoration.lineThrough,
