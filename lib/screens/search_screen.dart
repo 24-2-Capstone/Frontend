@@ -354,9 +354,7 @@ class _SearchScreenState extends State<SearchScreen> {
       floatingActionButton: FloatingActionButton(
         heroTag: 'map',
         onPressed: () {
-          Navigator.of(context).push(
-            _createRoute(), // 이동할 경로
-          );
+          _showCustomDialogWithAnimation(context);
         },
         backgroundColor: green_001,
         shape: CircleBorder(
@@ -434,6 +432,17 @@ class _SearchScreenState extends State<SearchScreen> {
         });
       },
       cursorErrorColor: Colors.red,
+    );
+  }
+
+  // 커스텀 애니메이션이 있는 Dialog Route 생성
+  void _showCustomDialogWithAnimation(BuildContext context) {
+    showDialog(
+      context: context,
+      barrierDismissible: true, // 배경을 눌러 다이얼로그 닫을 수 없도록 설정
+      builder: (context) {
+        return const MartMap(); // 애니메이션을 적용한 다이얼로그 위젯
+      },
     );
   }
 }
@@ -531,26 +540,4 @@ class BuildCategory extends StatelessWidget {
       ],
     );
   }
-}
-
-/// 아래에서 위로 올라오는 애니메이션을 구현하는 Route
-Route _createRoute() {
-  return PageRouteBuilder(
-    transitionDuration: const Duration(milliseconds: 500), // 애니메이션 속도
-    pageBuilder: (context, animation, secondaryAnimation) => const MartMap(),
-    transitionsBuilder: (context, animation, secondaryAnimation, child) {
-      const begin = Offset(0.0, 1.0); // 아래에서 시작
-      const end = Offset.zero; // 화면 중앙으로 도착
-      const curve = Curves.easeInOut;
-
-      final tween =
-          Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
-      final offsetAnimation = animation.drive(tween);
-
-      return SlideTransition(
-        position: offsetAnimation,
-        child: child,
-      );
-    },
-  );
 }
