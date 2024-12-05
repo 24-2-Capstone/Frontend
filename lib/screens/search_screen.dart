@@ -212,150 +212,145 @@ class _SearchScreenState extends State<SearchScreen> {
           ),
         ],
       ),
-      body: isLoading
-          ? const Center(child: CustomLoadingIndicator())
-          : Stack(
-              children: [
-                // 아래 콘텐츠
-                Padding(
-                  padding: const EdgeInsets.only(top: 56), // 기본 AppBar 높이 고려
-                  child: isLoading
-                      ? const Center(child: CustomLoadingIndicator())
-                      : selectedCategory == null
-                          ? GridView.builder(
-                              padding: const EdgeInsets.all(8.0),
-                              gridDelegate:
-                                  const SliverGridDelegateWithFixedCrossAxisCount(
-                                crossAxisCount: 2,
-                                crossAxisSpacing: 8.0,
-                                mainAxisSpacing: 8.0,
-                                childAspectRatio: 3 / 4,
-                              ),
-                              itemCount: allResponse.length,
-                              itemBuilder: (context, index) {
-                                final item = allResponse[index];
-                                return CategoryItem(
-                                  imagePath: item['imageURL'] ?? ' ',
-                                  name: item['goods_name'],
-                                  price: item['goods_price'],
-                                );
-                              },
-                            )
-                          : GridView.builder(
-                              padding: const EdgeInsets.all(8.0),
-                              gridDelegate:
-                                  const SliverGridDelegateWithFixedCrossAxisCount(
-                                crossAxisCount: 2,
-                                crossAxisSpacing: 8.0,
-                                mainAxisSpacing: 8.0,
-                                childAspectRatio: 3 / 4,
-                              ),
-                              itemCount:
-                                  categoryResponses[selectedCategory]?.length ??
-                                      0,
-                              itemBuilder: (context, index) {
-                                final item =
-                                    categoryResponses[selectedCategory]![index];
-                                return CategoryItem(
-                                  imagePath: item['imageURL'],
-                                  name: item['goods_name'],
-                                  price: item['goods_price'],
-                                );
-                              },
-                            ),
-                ),
-
-                // ExpansionTile
-                Positioned(
-                  top: 0,
-                  left: 0,
-                  right: 0,
-                  child: Material(
-                    elevation: 4.0, // 그림자 효과 추가
-                    child: ExpansionTile(
-                      title: isExpanded
-                          ? Text(
-                              "전체",
-                              style: TextStyle(
-                                color: brown_001,
-                                fontWeight: selectedCategory == "전체"
-                                    ? FontWeight.w600
-                                    : FontWeight.w400,
-                                fontSize: 16,
-                              ),
-                            )
-                          : SingleChildScrollView(
-                              scrollDirection: Axis.horizontal, // 가로 스크롤 설정
-                              child: Wrap(
-                                spacing: 29.w, // 각 Column 간 간격
-                                children: [
-                                  for (var category in expansionCategories)
-                                    BuildCategory(
-                                      category: category,
-                                      selectedCategory:
-                                          selectedCategory ?? "전체",
-                                    ),
-                                ],
-                              ),
-                            ),
-                      shape: const Border.symmetric(
-                          horizontal: BorderSide(
-                        color: Color(0xFFBBA998),
-                        width: 1,
-                      )),
-                      backgroundColor: yellow_001,
-                      iconColor: brown_001,
-                      collapsedBackgroundColor: yellow_001,
-                      collapsedIconColor: brown_001,
-                      textColor: brown_001,
-                      collapsedTextColor: brown_001,
-                      onExpansionChanged: (expanded) {
-                        setState(() {
-                          isExpanded = expanded;
-                        });
-                      },
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Wrap(
-                            spacing: 8.0,
-                            children: categories.map((category) {
-                              return ChoiceChip(
-                                label: Text(category),
-                                selected: selectedCategory == category,
-                                onSelected: (isSelected) {
-                                  setState(() {
-                                    selectedCategory =
-                                        isSelected ? category : null;
-                                  });
-                                },
-                                showCheckmark: false,
-                                selectedColor: brown_001,
-                                backgroundColor: yellow_001,
-                                surfaceTintColor: Colors.transparent,
-                                labelStyle: TextStyle(
-                                  color: selectedCategory == category
-                                      ? yellow_001
-                                      : brown_001,
-                                ),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(20.r),
-                                  side: BorderSide(
-                                    color: selectedCategory == category
-                                        ? brown_001
-                                        : const Color(0xFFCBBDAB),
-                                  ),
-                                ),
-                              );
-                            }).toList(),
-                          ),
+      body: Stack(
+        children: [
+          // 아래 콘텐츠
+          Padding(
+            padding: const EdgeInsets.only(top: 56), // 기본 AppBar 높이 고려
+            child: isLoading
+                ? const Center(child: CustomLoadingIndicator())
+                : selectedCategory == null
+                    ? GridView.builder(
+                        padding: const EdgeInsets.all(8.0),
+                        gridDelegate:
+                            const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                          crossAxisSpacing: 8.0,
+                          mainAxisSpacing: 8.0,
+                          childAspectRatio: 3 / 4,
                         ),
-                      ],
+                        itemCount: allResponse.length,
+                        itemBuilder: (context, index) {
+                          final item = allResponse[index];
+                          return CategoryItem(
+                            imagePath: item['imageURL'] ?? ' ',
+                            name: item['goods_name'],
+                            price: item['goods_price'],
+                          );
+                        },
+                      )
+                    : GridView.builder(
+                        padding: const EdgeInsets.all(8.0),
+                        gridDelegate:
+                            const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                          crossAxisSpacing: 8.0,
+                          mainAxisSpacing: 8.0,
+                          childAspectRatio: 3 / 4,
+                        ),
+                        itemCount:
+                            categoryResponses[selectedCategory]?.length ?? 0,
+                        itemBuilder: (context, index) {
+                          final item =
+                              categoryResponses[selectedCategory]![index];
+                          return CategoryItem(
+                            imagePath: item['imageURL'],
+                            name: item['goods_name'],
+                            price: item['goods_price'],
+                          );
+                        },
+                      ),
+          ),
+
+          // ExpansionTile
+          Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            child: Material(
+              elevation: 4.0, // 그림자 효과 추가
+              child: ExpansionTile(
+                title: isExpanded
+                    ? Text(
+                        "전체",
+                        style: TextStyle(
+                          color: brown_001,
+                          fontWeight: selectedCategory == "전체"
+                              ? FontWeight.w600
+                              : FontWeight.w400,
+                          fontSize: 16,
+                        ),
+                      )
+                    : SingleChildScrollView(
+                        scrollDirection: Axis.horizontal, // 가로 스크롤 설정
+                        child: Wrap(
+                          spacing: 29.w, // 각 Column 간 간격
+                          children: [
+                            for (var category in expansionCategories)
+                              BuildCategory(
+                                category: category,
+                                selectedCategory: selectedCategory ?? "전체",
+                              ),
+                          ],
+                        ),
+                      ),
+                shape: const Border.symmetric(
+                    horizontal: BorderSide(
+                  color: Color(0xFFBBA998),
+                  width: 1,
+                )),
+                backgroundColor: yellow_001,
+                iconColor: brown_001,
+                collapsedBackgroundColor: yellow_001,
+                collapsedIconColor: brown_001,
+                textColor: brown_001,
+                collapsedTextColor: brown_001,
+                onExpansionChanged: (expanded) {
+                  setState(() {
+                    isExpanded = expanded;
+                  });
+                },
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Wrap(
+                      spacing: 8.0,
+                      children: categories.map((category) {
+                        return ChoiceChip(
+                          label: Text(category),
+                          selected: selectedCategory == category,
+                          onSelected: (isSelected) {
+                            setState(() {
+                              selectedCategory = isSelected ? category : null;
+                            });
+                          },
+                          showCheckmark: false,
+                          selectedColor: brown_001,
+                          backgroundColor: yellow_001,
+                          surfaceTintColor: Colors.transparent,
+                          labelStyle: TextStyle(
+                            color: selectedCategory == category
+                                ? yellow_001
+                                : brown_001,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(20.r),
+                            side: BorderSide(
+                              color: selectedCategory == category
+                                  ? brown_001
+                                  : const Color(0xFFCBBDAB),
+                            ),
+                          ),
+                        );
+                      }).toList(),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
+          ),
+        ],
+      ),
       floatingActionButton: FloatingActionButton(
         heroTag: 'map',
         onPressed: () {

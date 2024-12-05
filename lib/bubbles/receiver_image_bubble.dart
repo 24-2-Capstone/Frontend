@@ -39,7 +39,7 @@ class ReceiverImageBubble extends StatelessWidget {
       children: [
         Container(
           constraints: BoxConstraints(
-            maxWidth: MediaQuery.of(context).size.width * 0.65, // 최대 너비 설정
+            maxWidth: MediaQuery.of(context).size.width * 0.7, // 최대 너비 설정
           ),
           decoration: BoxDecoration(
             color: yellow_002,
