@@ -315,6 +315,7 @@ class _ChattingScreenState extends State<ChattingScreen> {
 
     if (image != null) {
       setState(() {
+        _isLoading = true;
         _pickedImages = [image]; // 선택된 이미지를 리스트에 저장
 
         // 채팅 메시지에 이미지 추가
@@ -530,7 +531,19 @@ class _ChattingScreenState extends State<ChattingScreen> {
                                           await performTTS('계산대의 위치입니다!');
 
                                       if (filePath != null) {
+                                        setState(() {
+                                          _messages.add(
+                                              const ReceiverLoadingBubble());
+                                        });
+
+                                        await Future.delayed(
+                                            const Duration(seconds: 1));
+                                        setState(() {
+                                          _messages.remove(_messages.last);
+                                        });
+
                                         await playAudio(filePath);
+
                                         setState(() {
                                           _messages.add(
                                             ReceiverMapBubble(
