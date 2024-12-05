@@ -91,7 +91,7 @@ class ReceiverMapBubble extends StatelessWidget {
                                 top: 360.h + pad,
                                 left: 139.w + pad,
                                 child: Image.asset(
-                                  '/Users/huyn/Project/foofi/assets/images/fruit.png',
+                                  'assets/images/fruit.png',
                                   width: 26.w,
                                 ),
                               ),
@@ -99,7 +99,7 @@ class ReceiverMapBubble extends StatelessWidget {
                                 top: 300.h + pad,
                                 left: 155.w + pad,
                                 child: Image.asset(
-                                  '/Users/huyn/Project/foofi/assets/images/seafood.png',
+                                  'assets/images/seafood.png',
                                   width: 26.w,
                                 ),
                               ),
@@ -107,7 +107,7 @@ class ReceiverMapBubble extends StatelessWidget {
                                 top: 310.h + pad,
                                 left: 15.w + pad,
                                 child: Image.asset(
-                                  '/Users/huyn/Project/foofi/assets/images/vegetable.png',
+                                  'assets/images/vegetable.png',
                                   width: 38.w,
                                 ),
                               ),
@@ -115,7 +115,7 @@ class ReceiverMapBubble extends StatelessWidget {
                                 top: 149.h + pad,
                                 left: 134.w + pad,
                                 child: Image.asset(
-                                  '/Users/huyn/Project/foofi/assets/images/nut.png',
+                                  'assets/images/nut.png',
                                   width: 50.w,
                                 ),
                               ),
@@ -123,7 +123,7 @@ class ReceiverMapBubble extends StatelessWidget {
                                 top: 166.h + pad,
                                 left: 8.w + pad,
                                 child: Image.asset(
-                                  '/Users/huyn/Project/foofi/assets/images/meat.png',
+                                  'assets/images/meat.png',
                                   width: 34.w,
                                 ),
                               ),
@@ -131,7 +131,7 @@ class ReceiverMapBubble extends StatelessWidget {
                                 top: 26.h + pad,
                                 left: 93.w + pad,
                                 child: Image.asset(
-                                  '/Users/huyn/Project/foofi/assets/images/seasoning.png',
+                                  'assets/images/seasoning.png',
                                   width: 26.w,
                                 ),
                               ),
