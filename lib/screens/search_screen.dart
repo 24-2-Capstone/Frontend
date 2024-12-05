@@ -108,6 +108,47 @@ class _SearchScreenState extends State<SearchScreen> {
     }
   }
 
+  // 검색어로 상품을 필터링하여 데이터 가져오기
+  Future<void> fetchGoodsBySearch(String keyword) async {
+    final String baseUrl = "$back_url/goods/search/keyword";
+    try {
+      final Uri uri =
+          Uri.parse(baseUrl).replace(queryParameters: {'keyword': keyword});
+      final http.Response response = await http.get(uri);
+      print(response.statusCode);
+
+      if (response.statusCode == 200) {
+        final String decodedBody = utf8.decode(response.bodyBytes);
+        setState(() {
+          allResponse = List<Map<String, dynamic>>.from(
+              jsonDecode(decodedBody)['result']);
+          print('update');
+          isLoading = false; // 로딩 완료
+        });
+      } else {
+        setState(() {
+          isLoading = false;
+        });
+      }
+    } catch (e) {
+      print("오류 발생: $e");
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
+
+  // 검색어에 맞춰 데이터를 필터링
+  void _onSearchTextChanged(String keyword) {
+    if (keyword.isNotEmpty) {
+      // 필터링된 결과로 UI 업데이트
+      fetchGoodsBySearch(keyword);
+    } else {
+      // 검색어가 비어 있으면 모든 데이터를 다시 로드
+      fetchAllGoods();
+    }
+  }
+
   Future<void> fetchAllGoods() async {
     final String baseUrl = "$back_url/goods/search/all";
 
@@ -380,6 +421,7 @@ class _SearchScreenState extends State<SearchScreen> {
         setState(() {
           _counterText = (value.length).toString();
           textContent = textController.text;
+          _onSearchTextChanged(textContent); // 값 변경 될 때마다 호출
           //textProvider.saveName(value);
           if (value.isEmpty) {
             errorTextVal = 'min';

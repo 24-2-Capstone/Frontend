@@ -54,7 +54,7 @@ dependencies:
   nice_ripple: ^0.0.3
   webview_flutter: ^4.8.0
   webview_flutter_wkwebview: ^3.14.0
-  webview_flutter_android: ^4.1.0
+  
 
 dev_dependencies:
   flutter_test:

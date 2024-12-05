@@ -5,8 +5,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:foofi/color.dart';
 import 'package:foofi/screens/home_screen.dart';
 
-class ArriveInfo extends StatelessWidget {
-  const ArriveInfo({
+class ArriveInfoSearch extends StatelessWidget {
+  const ArriveInfoSearch({
     super.key,
   });
 

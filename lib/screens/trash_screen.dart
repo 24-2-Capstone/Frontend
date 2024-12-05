@@ -296,7 +296,7 @@ class _TrashState extends State<Trash> {
           _scrollToBottom(); // 서버 응답 메시지 추가 시 스크롤
 
           if (_detailedResult.isEmpty) {
-            _messages.add(ReceiverTextBubble(text: _reply));
+            _messages.add(ReceiverMapBubble(text: _reply));
             _messages.add(const SizedBox(height: 14.0));
           } else {
             _messages.add(ReceiverImageBubble(
@@ -380,7 +380,7 @@ class _TrashState extends State<Trash> {
 
         // UI에 응답 메시지 추가
         setState(() {
-          _messages.add(ReceiverTextBubble(text: reply));
+          _messages.add(ReceiverMapBubble(text: reply));
           _messages.add(const SizedBox(height: 14.0));
           _scrollToBottom(); // 서버 응답 메시지 추가 시 스크롤
         });
@@ -461,7 +461,7 @@ class _TrashState extends State<Trash> {
                           SizedBox(
                             height: 25.0.h,
                           ),
-                          ReceiverTextBubble(text: '무엇을 도와드릴까요?'),
+                          ReceiverMapBubble(text: '무엇을 도와드릴까요?'),
                           const SizedBox(
                             height: 14.0,
                           ),

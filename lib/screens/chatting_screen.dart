@@ -343,6 +343,13 @@ class _ChattingScreenState extends State<ChattingScreen> {
         if (filePath != null) {
           await playAudio(filePath);
         }
+        if (reply == "추천할 상품이 없습니다. 다른 이미지를 시도해보세요.") {
+          setState(() {
+            _messages.removeLast();
+            _messages.add(ReceiverTextBubble(text: reply));
+            _messages.add(SizedBox(height: 14.0.h));
+          });
+        }
 
         setState(() {
           // detailed_results가 null인 경우 빈 리스트로 초기화
@@ -357,12 +364,10 @@ class _ChattingScreenState extends State<ChattingScreen> {
           _messages.removeLast();
 
           if (detailedResults.isEmpty) {
-            _messages
-                .add(ReceiverTextBubble(text: "추천할 상품이 없습니다. 다른 이미지를 시도해보세요."));
+            _messages.add(ReceiverTextBubble(text: reply));
             _messages.add(SizedBox(height: 14.0.h));
           } else {
             _messages.add(ReceiverImageBubble(
-              //text: '조회된 상품 목록입니다.',
               text: reply,
               name: detailedResults[0]['product_name'],
               imageUrl: detailedResults[0]['image_url'],
@@ -485,7 +490,7 @@ class _ChattingScreenState extends State<ChattingScreen> {
                                   height: 30.h,
                                 ),
                                 ChoiceButton(
-                                    onTap: () {
+                                    onTap: () async {
                                       setState(() {
                                         isfirstChoice = false;
                                         _messages.add(
@@ -493,8 +498,21 @@ class _ChattingScreenState extends State<ChattingScreen> {
                                         );
                                         _messages.add(SizedBox(height: 14.h));
                                         _text = '계산대는 어디 있어?';
-                                        _sendTextPostRequest();
+                                        //_sendTextPostRequest();
                                       });
+                                      final filePath =
+                                          await performTTS('계산대의 위치입니다!');
+
+                                      if (filePath != null) {
+                                        await playAudio(filePath);
+                                        setState(() {
+                                          _messages.add(
+                                            ReceiverMapBubble(
+                                                text: '계산대의 위치입니다!'),
+                                          );
+                                          _messages.add(SizedBox(height: 14.h));
+                                        });
+                                      }
                                     },
                                     text: "계산대는 어디 있어?"),
                               ],

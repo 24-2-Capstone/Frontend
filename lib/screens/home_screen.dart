@@ -141,42 +141,31 @@ class HomeScreen extends StatelessWidget {
                 ),
                 Column(
                   children: [
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.push<void>(
-                          context,
-                          MaterialPageRoute<void>(
-                            builder: (BuildContext context) =>
-                                const ChattingScreen(),
-                          ),
-                        );
-                      },
-                      child: Material(
+                    Material(
+                      borderRadius: BorderRadius.circular(100.r),
+                      elevation: 4,
+                      color: green_001,
+                      child: InkWell(
+                        splashColor: green_001.withOpacity(0.5),
                         borderRadius: BorderRadius.circular(100.r),
-                        elevation: 4,
-                        color: green_001,
-                        child: InkWell(
-                          splashColor: green_001.withOpacity(0.5),
-                          borderRadius: BorderRadius.circular(100.r),
-                          onTap: () {
-                            Navigator.push<void>(
-                              context,
-                              MaterialPageRoute<void>(
-                                builder: (BuildContext context) =>
-                                    const ChattingScreen(),
-                              ),
-                            );
-                          },
-                          child: SizedBox(
-                            width: 105.w,
-                            height: 105.h,
-                            child: Padding(
-                              padding: const EdgeInsets.all(10.0),
-                              child: Icon(
-                                Icons.volume_up_rounded,
-                                color: brown_001,
-                                size: 38,
-                              ),
+                        onTap: () {
+                          Navigator.push<void>(
+                            context,
+                            MaterialPageRoute<void>(
+                              builder: (BuildContext context) =>
+                                  const ChattingScreen(),
+                            ),
+                          );
+                        },
+                        child: SizedBox(
+                          width: 105.w,
+                          height: 105.h,
+                          child: Padding(
+                            padding: const EdgeInsets.all(10.0),
+                            child: Icon(
+                              Icons.volume_up_rounded,
+                              color: brown_001,
+                              size: 38,
                             ),
                           ),
                         ),

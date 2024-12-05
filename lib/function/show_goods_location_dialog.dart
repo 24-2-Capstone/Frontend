@@ -8,7 +8,9 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:foofi/color.dart';
 import 'package:foofi/main.dart';
 import 'package:foofi/screens/arrive_info.dart';
+import 'package:foofi/screens/arrive_infot_search.dart';
 import 'package:foofi/screens/map_painter.dart';
+
 import 'package:http/http.dart' as http;
 import 'package:nice_ripple/nice_ripple.dart';
 
@@ -189,7 +191,7 @@ Future<dynamic> showGoodsLocationDialog(
                                           top: 360.h + pad,
                                           left: 139.w + pad,
                                           child: Image.asset(
-                                            '/Users/huyn/Project/foofi/assets/images/fruit.png',
+                                            'assets/images/fruit.png',
                                             width: 26.w,
                                           ),
                                         ),
@@ -197,7 +199,7 @@ Future<dynamic> showGoodsLocationDialog(
                                           top: 300.h + pad,
                                           left: 155.w + pad,
                                           child: Image.asset(
-                                            '/Users/huyn/Project/foofi/assets/images/seafood.png',
+                                            'assets/images/seafood.png',
                                             width: 26.w,
                                           ),
                                         ),
@@ -205,7 +207,7 @@ Future<dynamic> showGoodsLocationDialog(
                                           top: 310.h + pad,
                                           left: 15.w + pad,
                                           child: Image.asset(
-                                            '/Users/huyn/Project/foofi/assets/images/vegetable.png',
+                                            'assets/images/vegetable.png',
                                             width: 38.w,
                                           ),
                                         ),
@@ -213,7 +215,7 @@ Future<dynamic> showGoodsLocationDialog(
                                           top: 149.h + pad,
                                           left: 134.w + pad,
                                           child: Image.asset(
-                                            '/Users/huyn/Project/foofi/assets/images/nut.png',
+                                            'assets/images/nut.png',
                                             width: 50.w,
                                           ),
                                         ),
@@ -221,7 +223,7 @@ Future<dynamic> showGoodsLocationDialog(
                                           top: 166.h + pad,
                                           left: 8.w + pad,
                                           child: Image.asset(
-                                            '/Users/huyn/Project/foofi/assets/images/meat.png',
+                                            'assets/images/meat.png',
                                             width: 34.w,
                                           ),
                                         ),
@@ -229,8 +231,28 @@ Future<dynamic> showGoodsLocationDialog(
                                           top: 26.h + pad,
                                           left: 93.w + pad,
                                           child: Image.asset(
-                                            '/Users/huyn/Project/foofi/assets/images/seasoning.png',
+                                            'assets/images/seasoning.png',
                                             width: 26.w,
+                                          ),
+                                        ),
+                                        Positioned(
+                                          top: 220.h + pad,
+                                          left: 192.w + pad,
+                                          child: const Icon(
+                                            Icons.exit_to_app_outlined,
+                                          ),
+                                        ),
+                                        Positioned(
+                                          top: 270.h + pad,
+                                          left: 192.w + pad,
+                                          child: Transform(
+                                            alignment:
+                                                Alignment.center, // 반전 축의 기준점
+                                            transform: Matrix4.identity()
+                                              ..scale(-1.0, 1.0), // x축 반전
+                                            child: const Icon(
+                                              Icons.exit_to_app_outlined,
+                                            ),
                                           ),
                                         ),
                                         Positioned(
@@ -257,8 +279,7 @@ Future<dynamic> showGoodsLocationDialog(
                           ),
                         ),
                         Padding(
-                          padding:
-                              const EdgeInsets.only(top: 10.0, bottom: 10.0),
+                          padding: EdgeInsets.only(top: 0.0.h, bottom: 15.0.h),
                           child: Container(
                             decoration: BoxDecoration(
                               color: green_001,
