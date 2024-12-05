@@ -348,6 +348,7 @@ class _ChattingScreenState extends State<ChattingScreen> {
             _messages.removeLast();
             _messages.add(ReceiverTextBubble(text: reply));
             _messages.add(SizedBox(height: 14.0.h));
+            _scrollToBottom();
           });
         }
 
