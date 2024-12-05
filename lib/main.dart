@@ -4,7 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:foofi/color.dart';
 import 'package:foofi/screens/arrive_info.dart';
-import 'package:foofi/screens/trash_screen.dart';
+import 'package:foofi/screens/custom_loading_indicator.dart';
 import 'package:foofi/screens/home_screen.dart';
 import 'package:foofi/screens/overlay1_screen.dart';
 import 'package:foofi/screens/search_screen.dart';

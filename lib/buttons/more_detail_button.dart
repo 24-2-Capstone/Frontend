@@ -67,13 +67,16 @@ class _MoreDetailButtonState extends State<MoreDetailButton> {
                         Positioned(
                           right: 12.0.w,
                           top: 12.0.h,
-                          child: IconButton(
-                            padding: EdgeInsets.all(0.0.w),
-                            onPressed: () {
-                              Navigator.pop(context);
-                            },
-                            icon: const Icon(
-                              Icons.cancel,
+                          child: Hero(
+                            tag: 'map',
+                            child: IconButton(
+                              padding: EdgeInsets.all(0.0.w),
+                              onPressed: () {
+                                Navigator.pop(context);
+                              },
+                              icon: const Icon(
+                                Icons.cancel,
+                              ),
                             ),
                           ),
                         ),

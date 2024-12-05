@@ -9,6 +9,7 @@ import 'package:foofi/color.dart';
 import 'package:foofi/main.dart';
 import 'package:foofi/screens/arrive_info.dart';
 import 'package:foofi/screens/arrive_infot_search.dart';
+import 'package:foofi/screens/custom_loading_indicator.dart';
 import 'package:foofi/screens/map_painter.dart';
 
 import 'package:http/http.dart' as http;
@@ -60,7 +61,7 @@ Future<dynamic> showGoodsLocationDialog(
                   borderRadius: BorderRadius.circular(20.0),
                 ),
                 child: const Center(
-                  child: CircularProgressIndicator(),
+                  child: CustomLoadingIndicator(),
                 ),
               ),
             );

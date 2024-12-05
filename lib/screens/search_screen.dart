@@ -1,10 +1,13 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_floaty/flutter_floaty.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:foofi/color.dart';
 import 'package:foofi/function/show_goods_dialog.dart';
+import 'package:foofi/function/show_map_dialog.dart';
 import 'package:foofi/main.dart';
+import 'package:foofi/screens/custom_loading_indicator.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -210,14 +213,14 @@ class _SearchScreenState extends State<SearchScreen> {
         ],
       ),
       body: isLoading
-          ? const Center(child: CircularProgressIndicator())
+          ? const Center(child: CustomLoadingIndicator())
           : Stack(
               children: [
                 // 아래 콘텐츠
                 Padding(
                   padding: const EdgeInsets.only(top: 56), // 기본 AppBar 높이 고려
                   child: isLoading
-                      ? const Center(child: CircularProgressIndicator())
+                      ? const Center(child: CustomLoadingIndicator())
                       : selectedCategory == null
                           ? GridView.builder(
                               padding: const EdgeInsets.all(8.0),
@@ -354,7 +357,12 @@ class _SearchScreenState extends State<SearchScreen> {
               ],
             ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {},
+        heroTag: 'map',
+        onPressed: () {
+          Navigator.of(context).push(
+            _createRoute(), // 이동할 경로
+          );
+        },
         backgroundColor: green_001,
         shape: CircleBorder(
           side: BorderSide(
@@ -365,7 +373,7 @@ class _SearchScreenState extends State<SearchScreen> {
         child: Icon(
           Icons.map_outlined,
           color: brown_001,
-          size: 25.w,
+          size: 25.h,
         ),
       ),
     );
@@ -384,7 +392,7 @@ class _SearchScreenState extends State<SearchScreen> {
         fontWeight: FontWeight.w400,
       ),
       decoration: InputDecoration(
-        contentPadding: const EdgeInsets.all(20),
+        contentPadding: EdgeInsets.all(10.h),
         hintText: '검색어를 입력해주세요.',
         hintStyle: TextStyle(
           color: const Color(0xFFC3C2C2),
@@ -482,7 +490,7 @@ class CategoryItem extends StatelessWidget {
             ),
           ),
           Text(
-            formattedPrice,
+            "$formattedPrice 원",
             style: TextStyle(
               color: Colors.brown,
               fontSize: 14.h,
@@ -528,4 +536,26 @@ class BuildCategory extends StatelessWidget {
       ],
     );
   }
+}
+
+/// 아래에서 위로 올라오는 애니메이션을 구현하는 Route
+Route _createRoute() {
+  return PageRouteBuilder(
+    transitionDuration: const Duration(milliseconds: 500), // 애니메이션 속도
+    pageBuilder: (context, animation, secondaryAnimation) => const MartMap(),
+    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+      const begin = Offset(0.0, 1.0); // 아래에서 시작
+      const end = Offset.zero; // 화면 중앙으로 도착
+      const curve = Curves.easeInOut;
+
+      final tween =
+          Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+      final offsetAnimation = animation.drive(tween);
+
+      return SlideTransition(
+        position: offsetAnimation,
+        child: child,
+      );
+    },
+  );
 }

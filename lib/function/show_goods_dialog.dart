@@ -7,6 +7,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:foofi/color.dart';
 import 'package:foofi/function/show_goods_location_dialog.dart';
 import 'package:foofi/main.dart';
+import 'package:foofi/screens/custom_loading_indicator.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 
@@ -56,7 +57,7 @@ Future<dynamic> showGoodsDialog(BuildContext context, String name) {
                   borderRadius: BorderRadius.circular(20.0),
                 ),
                 child: const Center(
-                  child: CircularProgressIndicator(),
+                  child: CustomLoadingIndicator(),
                 ),
               ),
             );

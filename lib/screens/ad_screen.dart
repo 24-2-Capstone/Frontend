@@ -5,6 +5,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:foofi/color.dart';
 import 'package:foofi/function/show_goods_dialog.dart';
 import 'package:foofi/main.dart';
+import 'package:foofi/screens/custom_loading_indicator.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -117,7 +118,7 @@ class _AdScreenState extends State<AdScreen> {
         ),
       ),
       body: isLoading
-          ? const Center(child: CircularProgressIndicator())
+          ? const Center(child: CustomLoadingIndicator())
           : Stack(
               children: [
                 Column(
@@ -131,7 +132,7 @@ class _AdScreenState extends State<AdScreen> {
                 Padding(
                   padding: const EdgeInsets.only(top: 156), // 기본 AppBar 높이 고려
                   child: isLoading
-                      ? const Center(child: CircularProgressIndicator())
+                      ? const Center(child: CustomLoadingIndicator())
                       : GridView.builder(
                           padding: const EdgeInsets.all(8.0),
                           gridDelegate:
