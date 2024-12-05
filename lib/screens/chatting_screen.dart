@@ -157,17 +157,41 @@ class _ChattingScreenState extends State<ChattingScreen> {
       setState(() {
         _text = response.body;
       });
-      _messages.add(SenderTextBubble(text: response.body));
-      _messages.add(SizedBox(height: 14.h));
-      _scrollToBottom();
-      _sendTextPostRequest();
 
-      if (response.statusCode == 200) {
+      if (response.statusCode == 202) {
         final jsonResponse = jsonDecode(response.body);
-        setState(() {
-          //_sttResult = jsonResponse["text"] ?? "결과 없음";
-          _sttResult = jsonDecode(response.body);
-        });
+        // 오류 처리
+        if (response.body ==
+            "neuron_execution_fail:sub_neuron_return_nothing,rcz-kor-base-base64,0") {
+          setState(() {
+            _sttResult = jsonDecode(response.body);
+            showDialog(
+              context: context,
+              builder: (BuildContext buildContext) {
+                return Dialog(
+                  // insetPadding: EdgeInsets.symmetric(
+                  //     vertical: 90.0.h, horizontal: 24.0.w),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: yellow_002,
+                      borderRadius: BorderRadius.circular(20.0.r),
+                    ),
+                    child: const Text('다시 한 번 입력해주세요.'),
+                  ),
+                );
+              },
+            );
+          });
+        } else {
+          // 정상적으로 요청
+          setState(() {
+            _sttResult = jsonDecode(response.body);
+            _messages.add(SenderTextBubble(text: response.body));
+            _messages.add(SizedBox(height: 14.h));
+            _scrollToBottom();
+            _sendTextPostRequest();
+          });
+        }
       } else {
         print("STT 요청 실패: ${response.statusCode}, ${response.body}");
         setState(() {
@@ -566,7 +590,7 @@ class _ChattingScreenState extends State<ChattingScreen> {
                                   setState(() {
                                     isfirstChoice = false;
                                   });
-                                  _toggleRecording();
+                                  _isLoading ? null : _toggleRecording();
                                 },
                                 child: Container(
                                   height: 90,

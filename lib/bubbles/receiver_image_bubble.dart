@@ -73,12 +73,16 @@ class ReceiverImageBubble extends StatelessWidget {
                   ),
                   child: Text.rich(
                     textAlign: TextAlign.center,
+                    softWrap: true,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
                     TextSpan(
                       text: '$name\n',
                       style: TextStyle(
-                          color: brown_001,
-                          fontSize: 18,
-                          fontWeight: FontWeight.w400),
+                        color: brown_001,
+                        fontSize: 18,
+                        fontWeight: FontWeight.w400,
+                      ),
                       children: <TextSpan>[
                         TextSpan(
                           text: '${discountRate.toStringAsFixed(0)}% ',

@@ -232,13 +232,12 @@ class _SearchScreenState extends State<SearchScreen> {
                 : textContent.isNotEmpty
                     ? GridView.builder(
                         // 검색한 상품들
-                        padding: const EdgeInsets.all(8.0),
-                        gridDelegate:
-                            const SliverGridDelegateWithFixedCrossAxisCount(
+                        padding: EdgeInsets.all(8.0.w),
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                           crossAxisCount: 2,
-                          crossAxisSpacing: 8.0,
-                          mainAxisSpacing: 8.0,
-                          childAspectRatio: 3 / 4,
+                          crossAxisSpacing: 8.0.w,
+                          mainAxisSpacing: 8.0.h,
+                          childAspectRatio: 3 / 4.0,
                         ),
                         itemCount: searchResponse.length,
                         itemBuilder: (context, index) {
@@ -256,11 +255,11 @@ class _SearchScreenState extends State<SearchScreen> {
                             // 전체 상품들
                             padding: const EdgeInsets.all(8.0),
                             gridDelegate:
-                                const SliverGridDelegateWithFixedCrossAxisCount(
+                                SliverGridDelegateWithFixedCrossAxisCount(
                               crossAxisCount: 2,
-                              crossAxisSpacing: 8.0,
-                              mainAxisSpacing: 8.0,
-                              childAspectRatio: 3 / 4,
+                              crossAxisSpacing: 8.0.w,
+                              mainAxisSpacing: 8.0.h,
+                              childAspectRatio: 3 / 4.2,
                             ),
                             itemCount: allResponse.length,
                             itemBuilder: (context, index) {
@@ -277,11 +276,11 @@ class _SearchScreenState extends State<SearchScreen> {
                             // 카테고리별 상품들
                             padding: const EdgeInsets.all(8.0),
                             gridDelegate:
-                                const SliverGridDelegateWithFixedCrossAxisCount(
+                                SliverGridDelegateWithFixedCrossAxisCount(
                               crossAxisCount: 2,
-                              crossAxisSpacing: 8.0,
-                              mainAxisSpacing: 8.0,
-                              childAspectRatio: 3 / 4,
+                              crossAxisSpacing: 8.0.w,
+                              mainAxisSpacing: 8.0.h,
+                              childAspectRatio: 3 / 4.2,
                             ),
                             itemCount:
                                 categoryResponses[selectedCategory]?.length ??
@@ -560,6 +559,8 @@ class CategoryItem extends StatelessWidget {
                     fontSize: 16.h,
                     fontWeight: FontWeight.w500,
                   ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
                 ),
               ),
               Text(
