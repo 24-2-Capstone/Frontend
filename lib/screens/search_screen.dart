@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_floaty/flutter_floaty.dart';
@@ -230,6 +231,7 @@ class _SearchScreenState extends State<SearchScreen> {
                 ? const Center(child: CustomLoadingIndicator())
                 : textContent.isNotEmpty
                     ? GridView.builder(
+                        // 검색한 상품들
                         padding: const EdgeInsets.all(8.0),
                         gridDelegate:
                             const SliverGridDelegateWithFixedCrossAxisCount(
@@ -245,11 +247,13 @@ class _SearchScreenState extends State<SearchScreen> {
                             imagePath: item['imageURL'] ?? ' ',
                             name: item['goods_name'],
                             price: item['goods_price'],
+                            sale_price: item['sale_price'],
                           );
                         },
                       )
                     : selectedCategory == null
                         ? GridView.builder(
+                            // 전체 상품들
                             padding: const EdgeInsets.all(8.0),
                             gridDelegate:
                                 const SliverGridDelegateWithFixedCrossAxisCount(
@@ -265,10 +269,12 @@ class _SearchScreenState extends State<SearchScreen> {
                                 imagePath: item['imageURL'] ?? ' ',
                                 name: item['goods_name'],
                                 price: item['goods_price'],
+                                sale_price: item['sale_price'],
                               );
                             },
                           )
                         : GridView.builder(
+                            // 카테고리별 상품들
                             padding: const EdgeInsets.all(8.0),
                             gridDelegate:
                                 const SliverGridDelegateWithFixedCrossAxisCount(
@@ -287,6 +293,7 @@ class _SearchScreenState extends State<SearchScreen> {
                                 imagePath: item['imageURL'],
                                 name: item['goods_name'],
                                 price: item['goods_price'],
+                                sale_price: item['sale_price'],
                               );
                             },
                           ),
@@ -489,56 +496,84 @@ class CategoryItem extends StatelessWidget {
     required this.imagePath,
     required this.name,
     required this.price,
+    required this.sale_price,
   });
 
   String imagePath;
   String name;
   int price;
+  int sale_price;
 
   @override
   Widget build(BuildContext context) {
     final NumberFormat currencyFormat = NumberFormat('#,###');
-    String formattedPrice = currencyFormat.format(price);
+    String formattedPrice = sale_price != 0
+        ? currencyFormat.format(sale_price)
+        : currencyFormat.format(price);
 
-    return GestureDetector(
-      onTap: () {
-        showGoodsDialog(context, name);
-      },
-      child: Column(
-        children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(5.0.r),
-            child: Stack(
-              children: [
-                Image.network(
-                  imagePath,
-                  width: 151.w,
-                ),
-              ],
-            ),
-          ),
-          Padding(
-            padding: EdgeInsets.only(top: 5.0.h),
-            child: Text(
-              name,
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                color: Colors.brown,
-                fontSize: 16.h,
-                fontWeight: FontWeight.w500,
+    double discountRate = sale_price == 0
+        ? 0
+        : (100 - sale_price.toDouble() / price * 100).toDouble();
+
+    return Stack(
+      children: [
+        GestureDetector(
+          onTap: () {
+            showGoodsDialog(context, name);
+          },
+          child: Column(
+            children: [
+              Stack(
+                children: [
+                  Container(
+                    padding:
+                        EdgeInsets.only(top: 20.h, right: 20.w, left: 20.w),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(5.0.r),
+                      child: Image.network(
+                        imagePath,
+                        width: 151.w,
+                      ),
+                    ),
+                  ),
+                  if (discountRate >= 30)
+                    Positioned(
+                      right: -10.w,
+                      top: -10.h,
+                      child: Transform(
+                        transform: Matrix4.rotationZ(0.4), // 회전 예시
+                        child: Image.asset(
+                          'assets/images/sale_bubble_1.png',
+                          width: 80.w,
+                        ),
+                      ),
+                    ),
+                ],
               ),
-            ),
+              Padding(
+                padding: EdgeInsets.only(top: 5.0.h),
+                child: Text(
+                  name,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: Colors.brown,
+                    fontSize: 16.h,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+              Text(
+                "$formattedPrice 원",
+                style: TextStyle(
+                  color: Colors.brown,
+                  fontSize: 14.h,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ],
           ),
-          Text(
-            "$formattedPrice 원",
-            style: TextStyle(
-              color: Colors.brown,
-              fontSize: 14.h,
-              fontWeight: FontWeight.w700,
-            ),
-          ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }
