@@ -1,14 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:foofi/color.dart';
+import 'package:foofi/function/show_goods_dialog.dart';
 
 /// 더보기 버튼 class
 class MoreDetailButton extends StatefulWidget {
   MoreDetailButton({
     super.key,
     required this.onTap,
+    required this.detailedList,
   });
 
   VoidCallback onTap;
+  List<dynamic> detailedList;
 
   @override
   State<MoreDetailButton> createState() => _MoreDetailButtonState();
@@ -16,6 +21,18 @@ class MoreDetailButton extends StatefulWidget {
 
 class _MoreDetailButtonState extends State<MoreDetailButton> {
   Color buttonTextColor = Colors.black;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+
+    // 데이터 초기화
+    for (var item in widget.detailedList) {
+      item['discount_price'] ??= 0;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -34,12 +51,9 @@ class _MoreDetailButtonState extends State<MoreDetailButton> {
             showDialog(
               context: context,
               builder: (BuildContext context) {
-                final double height = MediaQuery.of(context).size.height / 852;
-                final double width = MediaQuery.of(context).size.width / 393;
-
                 return Dialog(
                   insetPadding: EdgeInsets.symmetric(
-                      vertical: 130.0 * height, horizontal: 24.0 * width),
+                      vertical: 130.0.h, horizontal: 24.0.w),
                   child: Container(
                     decoration: BoxDecoration(
                       color: yellow_002,
@@ -63,10 +77,10 @@ class _MoreDetailButtonState extends State<MoreDetailButton> {
                         Column(
                           children: [
                             SizedBox(
-                              height: 34 * width,
+                              height: 34.w,
                             ),
                             const Text(
-                              '상품명',
+                              '상품',
                               style: TextStyle(
                                 color: Colors.black,
                                 fontSize: 20.0,
@@ -92,36 +106,106 @@ class _MoreDetailButtonState extends State<MoreDetailButton> {
                                     crossAxisCount: 2,
                                     crossAxisSpacing: 15,
                                     mainAxisSpacing: 15,
-                                    childAspectRatio: 1 / 1.3,
+                                    childAspectRatio: 1 / 3,
                                   ),
-                                  itemCount: 3,
+                                  itemCount: widget.detailedList.length,
                                   itemBuilder:
                                       (BuildContext context, int index) {
+                                    if (widget.detailedList[index]
+                                            ['discount_price'] ==
+                                        null) {
+                                      setState(() {
+                                        widget.detailedList[index]
+                                            ['discount_price'] = 0;
+                                      });
+                                    }
+                                    double discountRate = (100 -
+                                            widget.detailedList[index]
+                                                        ['discount_price']
+                                                    .toDouble() /
+                                                widget.detailedList[index]
+                                                    ['original_price'] *
+                                                100)
+                                        .toDouble();
+
                                     return GestureDetector(
+                                      onTap: () {
+                                        showGoodsDialog(
+                                            context,
+                                            widget.detailedList[index]
+                                                ['product_name']);
+                                      },
                                       child: Column(
                                         crossAxisAlignment:
                                             CrossAxisAlignment.center,
                                         children: [
-                                          Image.asset(
-                                            "assets/images/flower.jpg",
-                                            height: 128,
-                                          ),
-                                          const Padding(
-                                            padding: EdgeInsets.only(top: 5.0),
-                                            child: Text(
-                                              '이름이름이름',
-                                              style: TextStyle(
-                                                  color: Colors.black,
-                                                  fontSize: 11,
-                                                  fontWeight: FontWeight.w400),
+                                          ClipRRect(
+                                            borderRadius:
+                                                BorderRadius.circular(5.0.r),
+                                            child: Image.network(
+                                              widget.detailedList[index]
+                                                  ['image_url'],
+                                              height: 128.h,
                                             ),
                                           ),
-                                          const Text(
-                                            '가격가격가격',
-                                            style: TextStyle(
+                                          Padding(
+                                            padding:
+                                                const EdgeInsets.only(top: 5.0),
+                                            child: Text(
+                                              widget.detailedList[index]
+                                                  ['product_name'],
+                                              textAlign: TextAlign.center,
+                                              style: const TextStyle(
                                                 color: Colors.black,
-                                                fontSize: 13,
-                                                fontWeight: FontWeight.w600),
+                                                fontSize: 11,
+                                                fontWeight: FontWeight.w400,
+                                              ),
+                                              overflow: TextOverflow
+                                                  .ellipsis, // 텍스트가 길면 말줄임표 처리
+                                              maxLines: 2, // 최대 2줄까지 표시
+                                            ),
+                                          ),
+                                          Column(
+                                            children: [
+                                              Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.center,
+                                                children: [
+                                                  if (discountRate != 0)
+                                                    Text(
+                                                      '${discountRate.toStringAsFixed(0)}% ',
+                                                      style: TextStyle(
+                                                        color: const Color(
+                                                            0xFFDC0000),
+                                                        fontSize: 15.w,
+                                                        fontWeight:
+                                                            FontWeight.w600,
+                                                        overflow: TextOverflow
+                                                            .ellipsis,
+                                                      ),
+                                                    ),
+                                                  Text(
+                                                    '${widget.detailedList[index]['discount_price']}원 ',
+                                                    style: TextStyle(
+                                                        color: brown_001,
+                                                        fontSize: 15.w,
+                                                        fontWeight:
+                                                            FontWeight.w600),
+                                                  ),
+                                                ],
+                                              ),
+                                              Text(
+                                                '${widget.detailedList[index]['original_price']}원 ',
+                                                style: TextStyle(
+                                                    color:
+                                                        const Color(0xFF707070),
+                                                    decoration: TextDecoration
+                                                        .lineThrough,
+                                                    fontSize: 13.w,
+                                                    fontWeight:
+                                                        FontWeight.w400),
+                                              ),
+                                            ],
                                           ),
                                         ],
                                       ),

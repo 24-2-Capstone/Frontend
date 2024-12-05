@@ -1,24 +1,26 @@
-import 'dart:convert';
 import 'dart:io';
-
-import 'package:flutter/cupertino.dart';
+import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter_sound/public/flutter_sound_recorder.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_sound/flutter_sound.dart';
 import 'package:foofi/bubbles/receiver_image_bubble.dart';
+import 'package:foofi/bubbles/receiver_loading_bubble.dart';
+import 'package:foofi/bubbles/receiver_text_bubble.dart';
 import 'package:foofi/bubbles/sender_image_bubble.dart';
 import 'package:foofi/bubbles/sender_text_bubble.dart';
-import 'package:foofi/bubbles/receiver_text_bubble.dart';
 import 'package:foofi/buttons/choice_button.dart';
-import 'package:foofi/buttons/more_detail_button.dart';
 import 'package:foofi/buttons/speak_button.dart';
 import 'package:foofi/color.dart';
-import 'package:foofi/function/perform_stt.dart';
+import 'package:foofi/function/perform_tts.dart';
 import 'package:foofi/main.dart';
-import 'package:http/http.dart' as http;
+import 'package:foofi/screens/overlay1_screen.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:loading_indicator/loading_indicator.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 
 class ChattingScreen extends StatefulWidget {
   const ChattingScreen({super.key});
@@ -28,142 +30,155 @@ class ChattingScreen extends StatefulWidget {
 }
 
 class _ChattingScreenState extends State<ChattingScreen> {
-  List<String> choices = ["사진", "끝내기"];
-  final bool _isSpeechInitialized = false; // SpeechToText 초기화 여부
-
-  final List<Widget> _messages = []; // 채팅 메시지 리스트
-
-  // 녹음 관련 변수 정의
   final FlutterSoundRecorder _recorder = FlutterSoundRecorder();
   bool _isRecording = false;
   String? _recordedFilePath;
+  String? _sttResult;
+  String _text = '';
+  String _reply = '';
+  bool isfirstChoice = true; // 맨 처음 선택지 표시
+  bool _isLoading = false; // 말풍선 로딩 상태 관리
 
-  // STT 관련 변수 정의
-  String _text = "음성을 입력하세요!";
-  String _reply = ""; // ReceiverBubble에 띄울 reply
+  final List<Widget> _messages = [];
   List<Map<dynamic, dynamic>> _detailedResult = [];
+
+  // 채팅창 스크롤 컨트롤러
+  late ScrollController _scrollController;
 
   // 이미지 업로드 관련 변수 정의
   final ImagePicker _picker = ImagePicker();
   List<XFile> _pickedImages = [];
 
-  // 채팅창 스크롤 컨트롤러
-  late ScrollController _scrollController;
-
   @override
   void initState() {
     super.initState();
     _initializeRecorder();
+    _initializeChat(); // 비동기 작업 호출
+
     _scrollController = ScrollController();
   }
 
   @override
   void dispose() {
-    _recorder.closeRecorder();
+    _recorder.closeAudioSession();
     _scrollController.dispose();
     super.dispose();
   }
 
-  /// Redcoder 초기화 함수
   Future<void> _initializeRecorder() async {
-    await Permission.microphone.request();
-    await _recorder.openRecorder();
+    final status = await Permission.microphone.request();
+    if (status != PermissionStatus.granted) {
+      throw Exception('Microphone permission not granted');
+    }
+    await _recorder.openAudioSession();
   }
 
-  /// Recoding 토글 함수
-  Future<void> _toggleRecording() async {
-    if (_isRecording) {
-      // 녹음 중이면 중단
-      await _stopRecording();
-      final file = File(_recordedFilePath!);
-      if (await file.exists()) {
-        final fileBytes = await file.readAsBytes();
-        print("녹음된 오디오 크기: ${fileBytes.length} bytes");
-      }
+  // 비동기 작업을 위한 메서드
+  Future<void> _initializeChat() async {
+    final filePath = await performTTS('무엇을 도와드릴까요?');
 
-      String? recognizedText = await performSTT(_recordedFilePath!);
-      print(recognizedText);
-
-      if (recognizedText != null && recognizedText.isNotEmpty) {
-        setState(() {
-          _text = recognizedText; // _text에 음성 인식 결과 저장
-        });
-
-        // 녹음 중단 후 POST 요청 보내기
-        await _sendTextPostRequest();
-      } else {
-        print("음성 인식에 실패했습니다.");
-        showDialog(
-            context: context,
-            builder: (BuildContext context) {
-              return const AlertDialog(
-                title: Text('음성 인식에 실패했습니다.'),
-              );
-            });
-      }
-    } else {
-      // 녹음 시작
-      await _startRecording();
+    if (filePath != null) {
+      await playAudio(filePath);
     }
   }
 
-  /// Recoding 시작 함수
-  Future<void> _startRecording() async {
-    // 경로 지정 (예시: 앱의 로컬 디렉토리에 저장)
-    _recordedFilePath = await _getFilePath();
-    print(_recordedFilePath);
-
+  Future<void> _toggleRecording() async {
     try {
-      // 파일 경로를 지정하여 녹음 시작
-      await _recorder.startRecorder(
-        toFile: _recordedFilePath, // 경로를 지정
-        sampleRate: 16000, // 샘플링 주파수 16000Hz 설정
+      if (_isRecording) {
+        // 녹음 중단
+        final filePath = await _recorder.stopRecorder();
+        setState(() {
+          _isRecording = false;
+          _recordedFilePath = filePath;
+        });
+        if (_recordedFilePath != null) {
+          // STT 요청
+          await _performSTT(_recordedFilePath!);
+        }
+      } else {
+        // 녹음 시작
+        final directory = await getApplicationDocumentsDirectory();
+        final filePath = '${directory.path}/recorded_audio.wav';
+
+        // 파일 경로 디버깅
+        print("녹음 파일 경로: $filePath");
+
+        // 녹음 시작
+        await _recorder.startRecorder(
+          toFile: filePath,
+          codec: Codec.pcm16WAV,
+          sampleRate: 16000,
+        );
+
+        setState(() {
+          _isRecording = true;
+          _recordedFilePath = filePath; // 경로를 미리 저장
+        });
+      }
+    } catch (e) {
+      print("녹음 중 오류 발생: $e");
+      setState(() {
+        _isRecording = false;
+        _sttResult = "녹음 중 오류 발생: $e";
+      });
+    }
+  }
+
+  Future<void> _performSTT(String audioFilePath) async {
+    try {
+      // 오디오 파일을 base64로 인코딩
+      final file = File(audioFilePath);
+      final fileBytes = await file.readAsBytes();
+      final base64userAudio = base64Encode(fileBytes);
+      print("Base64 길이: $base64userAudio");
+
+      const String url = "https://norchestra.maum.ai/harmonize/dosmart";
+      final Map<String, String> headers = {
+        "Content-Type": "application/json",
+        "cache-control": "no-cache",
+      };
+
+      final Map<String, dynamic> data = {
+        "app_id": "2533d2e6-bb6a-519c-a7c2-88464189f1e7",
+        "name": "sejong_conformer_stt_base64",
+        "item": ["rcz-kor-base-base64"], // 배열로 수정
+        "param": [base64userAudio],
+      };
+
+      final response = await http.post(
+        Uri.parse(url),
+        headers: headers,
+        body: jsonEncode(data),
       );
 
-      _recorder.setSubscriptionDuration(const Duration(milliseconds: 100));
-
+      print("응답 상태 코드: ${response.statusCode}");
+      print("응답 본문: ${response.body}");
       setState(() {
-        _isRecording = true;
+        _text = response.body;
       });
-    } catch (e) {
-      showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: const Text('녹음에 실패하였습니다!'),
-              content: Text('$e'),
-            );
-          });
-    }
-  }
+      _messages.add(SenderTextBubble(text: response.body));
+      _messages.add(SizedBox(height: 14.h));
+      _scrollToBottom();
+      _sendTextPostRequest();
 
-  Future<String> _getFilePath() async {
-    final directory = await getApplicationDocumentsDirectory(); // 앱의 문서 디렉토리
-    return '${directory.path}/audio_recording.wav'; // 저장할 파일 경로
-  }
-
-  /// Recoding 중지 함수
-  Future<void> _stopRecording() async {
-    final filePath = _recordedFilePath;
-    if (filePath != null && File(filePath).existsSync()) {
-      final file = File(filePath);
-      final fileLength = await file.length();
-
-      if (fileLength == 0) {
-        print("녹음이 제대로 되지 않았습니다. 파일이 비어있습니다.");
-        return;
+      if (response.statusCode == 200) {
+        final jsonResponse = jsonDecode(response.body);
+        setState(() {
+          //_sttResult = jsonResponse["text"] ?? "결과 없음";
+          _sttResult = jsonDecode(response.body);
+        });
+      } else {
+        print("STT 요청 실패: ${response.statusCode}, ${response.body}");
+        setState(() {
+          _sttResult = "STT 요청 실패";
+        });
       }
-
-      print("녹음이 완료되었습니다: $filePath");
-    } else {
-      print("파일이 생성되지 않았습니다.");
-      return;
+    } catch (e) {
+      print("STT 요청 중 오류 발생: $e");
+      setState(() {
+        _sttResult = "오류 발생: $e";
+      });
     }
-
-    await _recorder.stopRecorder();
-    setState(() {
-      _isRecording = false;
-    });
   }
 
   // POST 요청 메서드
@@ -172,6 +187,13 @@ class _ChattingScreenState extends State<ChattingScreen> {
       print('음성 인식 결과가 없습니다 !!');
       return;
     }
+
+    // 로딩 중 상태로 설정하고 "..." 추가
+    setState(() {
+      _isLoading = true;
+      _messages.add(const ReceiverLoadingBubble());
+      _scrollToBottom(); // 스크롤을 가장 아래로 이동
+    });
 
     // URL과 요청 데이터를 정의
     String url = '$ai_url/process_text';
@@ -195,28 +217,35 @@ class _ChattingScreenState extends State<ChattingScreen> {
                     ?.cast<Map<String, dynamic>>() ??
                 [];
         print(detailedResults);
+        final filePath = await performTTS(reply);
+
+        if (filePath != null) {
+          await playAudio(filePath);
+        }
 
         setState(() {
           _reply = reply; // 서버에서 받은 reply를 업데이트
           _detailedResult = detailedResults; // 서버에서 받은 detail을 업데이트
 
-          // 메시지 리스트에 추가
-          _messages.add(SenderTextBubble(text: _text));
-          _messages.add(const SizedBox(height: 14.0));
-          _scrollToBottom(); // 서버 응답 메시지 추가 시 스크롤
+          // "..." 말풍선을 제거
+          _messages.removeLast();
 
           if (_detailedResult.isEmpty) {
             _messages.add(ReceiverTextBubble(text: _reply));
-            _messages.add(const SizedBox(height: 14.0));
+            _messages.add(SizedBox(height: 14.0.h));
           } else {
             _messages.add(ReceiverImageBubble(
-              text: '조회된 사과 목록입니다.',
+              //text: '조회된 상품 목록입니다.',
+              text: reply,
               name: _detailedResult[0]['product_name'],
               imageUrl: _detailedResult[0]['image_url'],
-              originalPrice: _detailedResult[0]['original_price'],
-              discountPrice: _detailedResult[0]['discount_price'],
+              imageUrl1: _detailedResult[1]['image_url'],
+              imageUrl2: _detailedResult[2]['image_url'],
+              originalPrice: _detailedResult[0]['original_price'] ?? 0,
+              discountPrice: _detailedResult[0]['discount_price'] ?? 0,
+              detailedList: responseData["detailed_results"],
             ));
-            _messages.add(const SizedBox(height: 14.0));
+            _messages.add(SizedBox(height: 14.0.h));
           }
           _scrollToBottom(); // 서버 응답 메시지 추가 시 스크롤
         });
@@ -232,6 +261,22 @@ class _ChattingScreenState extends State<ChattingScreen> {
       // 네트워크 오류 등 예외 처리
       print('POST 요청 오류: $error');
       print(_text);
+    } finally {
+      setState(() {
+        _isLoading = false; // 로딩 상태 해제
+      });
+    }
+  }
+
+  Future<void> playAudio(String filePath) async {
+    final player = AudioPlayer();
+
+    try {
+      // 파일 경로 기반으로 재생
+      await player.play(DeviceFileSource(filePath));
+      print("오디오 재생 성공");
+    } catch (e) {
+      print("오디오 재생 중 오류 발생: $e");
     }
   }
 
@@ -270,6 +315,13 @@ class _ChattingScreenState extends State<ChattingScreen> {
       // 서버 URL 설정
       String url = '$ai_url/process_image';
 
+      // 로딩 중 상태로 설정하고 "..." 추가
+      setState(() {
+        _isLoading = true;
+        _messages.add(const ReceiverLoadingBubble());
+        _scrollToBottom(); // 스크롤을 가장 아래로 이동
+      });
+
       // POST 요청
       final response = await http.post(
         Uri.parse(url),
@@ -283,12 +335,45 @@ class _ChattingScreenState extends State<ChattingScreen> {
         // 서버 응답 처리
         final Map<String, dynamic> responseData = jsonDecode(response.body);
         final String reply = responseData['reply'] ?? '결과 없음';
+
         print(responseData);
 
-        // UI에 응답 메시지 추가
+        final filePath = await performTTS(reply);
+
+        if (filePath != null) {
+          await playAudio(filePath);
+        }
+
         setState(() {
-          _messages.add(ReceiverTextBubble(text: reply));
-          _messages.add(const SizedBox(height: 14.0));
+          // detailed_results가 null인 경우 빈 리스트로 초기화
+          final List<Map<String, dynamic>> detailedResults =
+              (responseData['detailed_results'] as List<dynamic>?)
+                      ?.cast<Map<String, dynamic>>() ??
+                  [];
+
+          // UI에 응답 메시지 추가
+
+          // "..." 말풍선을 제거
+          _messages.removeLast();
+
+          if (detailedResults.isEmpty) {
+            _messages
+                .add(ReceiverTextBubble(text: "추천할 상품이 없습니다. 다른 이미지를 시도해보세요."));
+            _messages.add(SizedBox(height: 14.0.h));
+          } else {
+            _messages.add(ReceiverImageBubble(
+              //text: '조회된 상품 목록입니다.',
+              text: reply,
+              name: detailedResults[0]['product_name'],
+              imageUrl: detailedResults[0]['image_url'],
+              imageUrl1: detailedResults[1]['image_url'],
+              imageUrl2: detailedResults[2]['image_url'],
+              originalPrice: detailedResults[0]['original_price'] ?? 0,
+              discountPrice: detailedResults[0]['discount_price'] ?? 0,
+              detailedList: responseData["detailed_results"],
+            ));
+            _messages.add(SizedBox(height: 14.0.h));
+          }
           _scrollToBottom(); // 서버 응답 메시지 추가 시 스크롤
         });
 
@@ -297,16 +382,25 @@ class _ChattingScreenState extends State<ChattingScreen> {
         print('POST 요청 실패: ${response.statusCode}');
       }
     } catch (e) {
+      setState(() {
+        _isRecording = false;
+        _sttResult = "녹음 중 오류 발생: $e";
+      });
       print('이미지 처리 또는 POST 요청 오류: $e');
+    } finally {
+      setState(() {
+        _isLoading = false; // 로딩 상태 해제
+      });
     }
   }
 
+  /// 스트롤
   void _scrollToBottom() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (_scrollController.hasClients) {
         _scrollController.animateTo(
           _scrollController.position.maxScrollExtent,
-          duration: const Duration(seconds: 5),
+          duration: const Duration(seconds: 1),
           curve: Curves.easeOut,
         );
       }
@@ -315,121 +409,211 @@ class _ChattingScreenState extends State<ChattingScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final double height = MediaQuery.of(context).size.height / 852;
-    final double width = MediaQuery.of(context).size.width / 393;
-
     return Scaffold(
-      backgroundColor: yellow_001,
-      appBar: AppBar(
-        backgroundColor: yellow_001,
-        leading: Padding(
-          padding: const EdgeInsets.only(left: 10.0, top: 10.0),
-          child: IconButton(
-            onPressed: () {
-              Navigator.pop(context);
-            },
-            icon: Icon(
-              Icons.home_outlined,
-              size: 30,
-              color: brown_001,
-            ),
-          ),
-        ),
-        title: Text(
-          '대화하기',
-          style: TextStyle(
-            color: brown_001,
-            fontSize: 32,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Flexible(
-              flex: 545,
-              child: SizedBox(
-                width: double.infinity,
-                height: double.maxFinite,
-                child: SingleChildScrollView(
-                  controller: _scrollController,
-                  primary: false,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      ReceiverTextBubble(text: '무엇을 도와드릴까요?'),
-                      const SizedBox(
-                        height: 14.0,
+      body: Stack(
+        children: [
+          Column(
+            //mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Flexible(
+                flex: 115,
+                child: AppBar(
+                  backgroundColor: yellow_001,
+                  leading: Padding(
+                    padding: EdgeInsets.only(left: 10.0.w, top: 10.0.h),
+                    child: IconButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      icon: Icon(
+                        Icons.home_outlined,
+                        size: 30.w,
+                        color: brown_001,
                       ),
-                      Column(
-                        children: _messages,
+                    ),
+                  ),
+                  title: Text(
+                    '대화하기',
+                    style: TextStyle(
+                      color: brown_001,
+                      fontSize: 32,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+              ),
+              Flexible(
+                flex: 545,
+                child: Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 16.0.w),
+                  child: SizedBox(
+                    width: double.infinity,
+                    height: double.maxFinite,
+                    child: SingleChildScrollView(
+                      controller: _scrollController,
+                      primary: false,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          SizedBox(
+                            height: 25.0.h,
+                          ),
+                          ReceiverTextBubble(text: '무엇을 도와드릴까요?'),
+                          const SizedBox(
+                            height: 14.0,
+                          ),
+                          if (isfirstChoice)
+                            Column(
+                              children: [
+                                SizedBox(
+                                  height: 80.h,
+                                ),
+                                ChoiceButton(
+                                    onTap: () {
+                                      setState(() {
+                                        isfirstChoice = false;
+                                        _messages.add(SenderTextBubble(
+                                            text: '맛있는 사과를 추천해줘'));
+                                        _messages.add(SizedBox(height: 14.h));
+                                        _text = '맛있는 사과를 추천해줘';
+                                        _sendTextPostRequest();
+                                      });
+                                    },
+                                    text: "맛있는 사과를\n추천해줘"),
+                                SizedBox(
+                                  height: 30.h,
+                                ),
+                                ChoiceButton(
+                                    onTap: () {
+                                      setState(() {
+                                        isfirstChoice = false;
+                                        _messages.add(
+                                          SenderTextBubble(text: '계산대는 어디 있어?'),
+                                        );
+                                        _messages.add(SizedBox(height: 14.h));
+                                        _text = '계산대는 어디 있어?';
+                                        _sendTextPostRequest();
+                                      });
+                                    },
+                                    text: "계산대는 어디 있어?"),
+                              ],
+                            ),
+                          Column(
+                            children: _messages,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              Flexible(
+                flex: 192,
+                child: Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 16.0.w),
+                  child: Stack(
+                    children: [
+                      Center(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Padding(
+                              padding:
+                                  EdgeInsets.only(top: 22.0.h, bottom: 9.0.h),
+                              child: Text(
+                                _isRecording
+                                    ? '녹음 중...'
+                                    : (_recordedFilePath != null
+                                        ? '버튼을 눌러 말해 보세요!'
+                                        : '버튼을 눌러 말해 보세요!'),
+                                style: TextStyle(
+                                  color: brown_001,
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
+                            Material(
+                              color: _isRecording ? brown_001 : green_001,
+                              borderRadius: BorderRadius.circular(100),
+                              elevation: 4,
+                              child: InkWell(
+                                splashColor: green_001.withOpacity(0.5),
+                                borderRadius: BorderRadius.circular(100),
+                                onTap: () async {
+                                  setState(() {
+                                    isfirstChoice = false;
+                                  });
+                                  _toggleRecording();
+                                },
+                                child: Container(
+                                  height: 90,
+                                  width: 90,
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(100),
+                                    border: _isRecording
+                                        ? Border.all(style: BorderStyle.none)
+                                        : Border.all(
+                                            color: green_003.withOpacity(0.3),
+                                            width: 3.0,
+                                            strokeAlign:
+                                                BorderSide.strokeAlignCenter,
+                                          ),
+                                  ),
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(10),
+                                    child: _isRecording
+                                        ? Padding(
+                                            padding: const EdgeInsets.all(16.0),
+                                            child: SizedBox(
+                                              width: 38,
+                                              height: 38,
+                                              child: LoadingIndicator(
+                                                indicatorType:
+                                                    Indicator.lineScalePulseOut,
+                                                colors: [yellow_001],
+                                                strokeWidth: 5.0,
+                                              ),
+                                            ),
+                                          )
+                                        : Icon(
+                                            Icons.mic_none_sharp,
+                                            color: brown_001,
+                                            size: 38,
+                                          ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Positioned(
+                        bottom: 63.h,
+                        right: 32.w,
+                        child: IconButton(
+                          icon: Icon(
+                            Icons.upload,
+                            size: 25.w,
+                          ),
+                          onPressed: () {
+                            setState(() {
+                              isfirstChoice = false;
+                            });
+                            _pickImg();
+                          },
+                        ),
                       ),
                     ],
                   ),
                 ),
               ),
-            ),
-            Flexible(
-              flex: 192,
-              child: Stack(
-                children: [
-                  Center(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        // 말하기 버튼 안내 문구
-                        Padding(
-                          padding: const EdgeInsets.only(top: 22.0),
-                          child: Text(
-                            '버튼을 눌러 말해보세요!',
-                            style: TextStyle(
-                              color: brown_001,
-                              fontSize: 18,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ),
-
-                        // 말하기 버튼
-                        Padding(
-                          padding: const EdgeInsets.only(top: 9.0),
-                          child: SpeakButton(
-                            onTap: _toggleRecording,
-                            isRecording: _isRecording,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Positioned(
-                    top: 50.0,
-                    right: 0.0,
-                    child: Wrap(
-                      spacing: 8.0 * width,
-                      crossAxisAlignment: WrapCrossAlignment.end,
-                      direction: Axis.vertical,
-                      children: [
-                        ChoiceButton(
-                          onTap: () async {
-                            await _pickImg();
-                          },
-                          text: choices[0],
-                        ),
-                        ChoiceButton(
-                          onTap: () {},
-                          text: choices[1],
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
+            ],
+          ),
+          const OverlayScreen1(),
+        ],
       ),
     );
   }

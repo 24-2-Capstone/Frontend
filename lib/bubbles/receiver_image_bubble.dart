@@ -1,4 +1,7 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:foofi/buttons/more_detail_button.dart';
 import 'package:foofi/color.dart';
 
@@ -9,15 +12,21 @@ class ReceiverImageBubble extends StatelessWidget {
     required this.text,
     required this.name,
     required this.imageUrl,
+    required this.imageUrl1,
+    required this.imageUrl2,
     required this.originalPrice,
     required this.discountPrice,
+    required this.detailedList,
   });
 
   String text;
   String name;
   String imageUrl;
+  String imageUrl1;
+  String imageUrl2;
   int originalPrice;
   int discountPrice;
+  List<dynamic> detailedList;
 
   @override
   Widget build(BuildContext context) {
@@ -32,7 +41,7 @@ class ReceiverImageBubble extends StatelessWidget {
           ),
           decoration: BoxDecoration(
             color: yellow_002,
-            borderRadius: BorderRadius.circular(30),
+            borderRadius: BorderRadius.circular(30.r),
             border: Border.all(
               color: yellow_003.withOpacity(0.3),
               width: 3.0,
@@ -40,10 +49,16 @@ class ReceiverImageBubble extends StatelessWidget {
             ),
           ),
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 15),
+            padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 15.h),
             child: Column(
               children: [
-                Image.network(imageUrl),
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(5.0.r),
+                  child: Image.network(
+                    imageUrl,
+                    height: 200.h,
+                  ),
+                ),
                 Container(
                   padding: const EdgeInsets.symmetric(
                       horizontal: 12.0, vertical: 6.0),
@@ -94,13 +109,17 @@ class ReceiverImageBubble extends StatelessWidget {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
-                      Text(
-                        '멘트멘트멘트멘트',
-                        textAlign: TextAlign.left,
-                        style: TextStyle(
-                          color: brown_001,
-                          fontSize: 18,
-                          fontWeight: FontWeight.w500,
+                      Container(
+                        constraints: BoxConstraints(maxWidth: 220.w),
+                        child: Text(
+                          text,
+                          textAlign: TextAlign.left,
+                          softWrap: true,
+                          style: TextStyle(
+                            color: brown_001,
+                            fontSize: 18,
+                            fontWeight: FontWeight.w500,
+                          ),
                         ),
                       ),
                     ],
@@ -109,22 +128,23 @@ class ReceiverImageBubble extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Image.asset(
-                      'assets/images/flower.jpg',
-                      width: 50,
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(5.0.r),
+                      child: Image.network(
+                        imageUrl1,
+                        width: 60.w,
+                      ),
                     ),
-                    // const SizedBox(
-                    //   width: 18.0,
-                    // ),
-                    Image.asset(
-                      'assets/images/flower.jpg',
-                      width: 50,
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(5.0.r),
+                      child: Image.network(
+                        imageUrl2,
+                        width: 60.w,
+                      ),
                     ),
-                    // const SizedBox(
-                    //   width: 25.0,
-                    // ),
                     MoreDetailButton(
                       onTap: () {},
+                      detailedList: detailedList,
                     ),
                   ],
                 ),

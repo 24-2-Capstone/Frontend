@@ -10,13 +10,13 @@ class SpeakButton extends StatelessWidget {
     required this.isRecording,
   });
 
-  VoidCallback onTap;
+  Future<void> Function()? onTap;
   bool isRecording;
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: onTap,
+      //onTap: onTap,
       child: Material(
         color: isRecording ? brown_001 : green_001,
         borderRadius: BorderRadius.circular(100),
@@ -24,7 +24,9 @@ class SpeakButton extends StatelessWidget {
         child: InkWell(
           splashColor: green_001.withOpacity(0.5),
           borderRadius: BorderRadius.circular(100),
-          onTap: onTap,
+          onTap: () async {
+            onTap;
+          },
           child: Container(
             height: 90,
             width: 90,

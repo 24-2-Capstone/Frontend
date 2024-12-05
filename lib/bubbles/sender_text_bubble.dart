@@ -16,6 +16,9 @@ class SenderTextBubble extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
         Container(
+          constraints: BoxConstraints(
+            maxWidth: MediaQuery.of(context).size.width * 0.8, // 최대 너비 설정
+          ),
           decoration: BoxDecoration(
             color: gray_001,
             borderRadius: BorderRadius.circular(30),
@@ -34,6 +37,8 @@ class SenderTextBubble extends StatelessWidget {
                 fontSize: 16,
                 fontWeight: FontWeight.w500,
               ),
+              softWrap: true,
+              overflow: TextOverflow.visible,
             ),
           ),
         ),

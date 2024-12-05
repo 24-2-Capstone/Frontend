@@ -6,8 +6,10 @@ Future<String?> performSTT(String audioFilePath) async {
   try {
     // 오디오 파일을 base64로 인코딩
     final file = File(audioFilePath);
-    final base64Audio = base64Encode(await file.readAsBytes());
-    print(base64Audio);
+    final fileBytes = await file.readAsBytes(); // 파일을 바이트로 읽기
+    final base64userAudio = base64Encode(fileBytes); // Base64 인코딩
+
+    print(base64userAudio);
 
     const String url = "https://norchestra.maum.ai/harmonize/dosmart";
     final Map<String, String> headers = {
@@ -19,7 +21,7 @@ Future<String?> performSTT(String audioFilePath) async {
       "app_id": "2533d2e6-bb6a-519c-a7c2-88464189f1e7",
       "name": "sejong_conformer_stt_base64",
       "item": ["rcz-kor-base-base64"],
-      "param": [base64Audio],
+      "param": [base64userAudio],
     };
 
     // POST 요청 보내기

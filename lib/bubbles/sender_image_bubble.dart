@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:foofi/color.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -36,15 +37,18 @@ class SenderImageBubble extends StatelessWidget {
               children: [
                 Padding(
                   padding: const EdgeInsets.all(16.0),
-                  child: Container(
-                    width: 150, // 적절한 너비와 높이를 설정하세요.
-                    height: 150,
-                    decoration: BoxDecoration(
-                      color: gray_001,
-                      image: DecorationImage(
-                        fit: BoxFit.fill,
-                        image: FileImage(
-                          File(image.path),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(5.r),
+                    child: Container(
+                      width: 150, // 적절한 너비와 높이를 설정하세요.
+                      height: 150,
+                      decoration: BoxDecoration(
+                        color: gray_001,
+                        image: DecorationImage(
+                          fit: BoxFit.fill,
+                          image: FileImage(
+                            File(image.path),
+                          ),
                         ),
                       ),
                     ),

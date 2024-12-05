@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:foofi/color.dart';
 
 /// 선택 버튼 class
@@ -36,6 +37,8 @@ class _ChoiceButtonState extends State<ChoiceButton> {
             });
           },
           child: Container(
+            width: 150.w,
+            height: 116.h,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(20),
               border: Border.all(
@@ -44,13 +47,12 @@ class _ChoiceButtonState extends State<ChoiceButton> {
                 strokeAlign: BorderSide.strokeAlignCenter,
               ),
             ),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+            child: Center(
               child: Text(
                 widget.text,
                 style: TextStyle(
                   color: buttonTextColor,
-                  fontSize: 10,
+                  fontSize: 16.w,
                   fontWeight: FontWeight.w500,
                 ),
               ),

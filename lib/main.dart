@@ -1,7 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:foofi/color.dart';
+import 'package:foofi/screens/arrive_info.dart';
+import 'package:foofi/screens/trash_screen.dart';
 import 'package:foofi/screens/home_screen.dart';
+import 'package:foofi/screens/overlay1_screen.dart';
+import 'package:foofi/screens/search_screen.dart';
+import 'package:foofi/screens/test_another.dart';
+import 'package:foofi/screens/chatting_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -21,13 +29,17 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'FooFi',
-      theme: ThemeData(
-        fontFamily: 'IBM Plex Sans KR',
-        scaffoldBackgroundColor: yellow_001,
+    return ScreenUtilInit(
+      designSize: const Size(393, 852),
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        title: 'FooFi',
+        theme: ThemeData(
+          fontFamily: 'IBM Plex Sans KR',
+          scaffoldBackgroundColor: yellow_001,
+        ),
+        home: const HomeScreen(),
       ),
-      home: const HomeScreen(),
     );
   }
 }

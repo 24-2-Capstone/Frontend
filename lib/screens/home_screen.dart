@@ -2,6 +2,8 @@ import 'package:card_swiper/card_swiper.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:foofi/screens/ad_screen.dart';
 import 'package:foofi/screens/chatting_screen.dart';
 import 'package:foofi/color.dart';
 import 'package:foofi/screens/search_screen.dart';
@@ -11,28 +13,32 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    double height = MediaQuery.of(context).size.height / 852;
-    double width = MediaQuery.of(context).size.width / 393;
-
     // Swiper에 들어갈 위젯 리스트
     List<Widget> widgetList = [
-      Container(
-        decoration: BoxDecoration(
-          color: Colors.pink[50],
-          borderRadius: BorderRadius.circular(10),
+      GestureDetector(
+        onTap: () {
+          Navigator.push<void>(
+            context,
+            MaterialPageRoute<void>(
+              builder: (BuildContext context) => const AdScreen(),
+            ),
+          );
+        },
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(10.0.r),
+          child: Image.asset('assets/images/sale.gif'),
         ),
       ),
-      Container(
-        decoration: BoxDecoration(
-          color: Colors.cyan[50],
-          borderRadius: BorderRadius.circular(10),
-        ),
-      ),
-      Container(
-        decoration: BoxDecoration(
-          color: const Color.fromARGB(255, 227, 250, 224),
-          borderRadius: BorderRadius.circular(10),
-        ),
+      // ClipRRect(
+      //   borderRadius: BorderRadius.circular(10.0.r),
+      //   child: Image.asset(
+      //     'assets/images/banner_2.png',
+      //     height: 609.h,
+      //   ),
+      // ),
+      ClipRRect(
+        borderRadius: BorderRadius.circular(10.0.r),
+        child: Image.asset('assets/images/banner_1.jpeg'),
       ),
     ];
 
@@ -44,17 +50,16 @@ class HomeScreen extends StatelessWidget {
         children: [
           Container(
             color: yellow_001,
-            height: 503,
-            width: 393,
+            height: 503.h,
+            width: 395.w,
             child: Swiper(
-              viewportFraction: 0.95,
-              scale: 0.9,
+              viewportFraction: 1.0,
+              scale: 1.0,
               autoplay: true,
               itemBuilder: (context, index) {
                 return Container(
                     margin: const EdgeInsets.symmetric(
-                      vertical: 5,
-                    ), // 좌우 간격 추가
+                        vertical: 0, horizontal: 0.0), // 좌우 간격 추가
                     child: widgetList[index]);
               },
               itemCount: widgetList.length,
@@ -69,7 +74,7 @@ class HomeScreen extends StatelessWidget {
             ),
           ),
           Padding(
-            padding: const EdgeInsets.only(top: 24.0),
+            padding: EdgeInsets.only(top: 24.0.h),
             child: Text(
               '무엇을 도와드릴까요?',
               style: TextStyle(
@@ -80,19 +85,19 @@ class HomeScreen extends StatelessWidget {
             ),
           ),
           Padding(
-            padding: const EdgeInsets.only(top: 28.0),
+            padding: EdgeInsets.only(top: 28.0.h),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Column(
                   children: [
                     Material(
-                      borderRadius: BorderRadius.circular(100),
+                      borderRadius: BorderRadius.circular(100.r),
                       elevation: 4,
                       color: green_001,
                       child: InkWell(
                         splashColor: green_001.withOpacity(0.5),
-                        borderRadius: BorderRadius.circular(100),
+                        borderRadius: BorderRadius.circular(100.r),
                         onTap: () {
                           Navigator.push<void>(
                             context,
@@ -117,7 +122,7 @@ class HomeScreen extends StatelessWidget {
                       ),
                     ),
                     Padding(
-                      padding: const EdgeInsets.only(top: 15.0),
+                      padding: EdgeInsets.only(top: 15.0.h),
                       child: Text(
                         '상품\n검색하기',
                         textAlign: TextAlign.center,
@@ -130,8 +135,8 @@ class HomeScreen extends StatelessWidget {
                     ),
                   ],
                 ),
-                const SizedBox(
-                  width: 30,
+                SizedBox(
+                  width: 30.w,
                 ),
                 Column(
                   children: [
@@ -146,12 +151,12 @@ class HomeScreen extends StatelessWidget {
                         );
                       },
                       child: Material(
-                        borderRadius: BorderRadius.circular(100),
+                        borderRadius: BorderRadius.circular(100.r),
                         elevation: 4,
                         color: green_001,
                         child: InkWell(
                           splashColor: green_001.withOpacity(0.5),
-                          borderRadius: BorderRadius.circular(100),
+                          borderRadius: BorderRadius.circular(100.r),
                           onTap: () {
                             Navigator.push<void>(
                               context,
@@ -162,8 +167,8 @@ class HomeScreen extends StatelessWidget {
                             );
                           },
                           child: SizedBox(
-                            width: 105,
-                            height: 105,
+                            width: 105.w,
+                            height: 105.h,
                             child: Padding(
                               padding: const EdgeInsets.all(10.0),
                               child: Icon(
@@ -177,9 +182,9 @@ class HomeScreen extends StatelessWidget {
                       ),
                     ),
                     Padding(
-                      padding: const EdgeInsets.only(top: 15.0),
+                      padding: EdgeInsets.only(top: 15.0.h),
                       child: Text(
-                        '푸피와\n대화하기',
+                        '에이미와\n대화하기',
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           color: brown_001,
