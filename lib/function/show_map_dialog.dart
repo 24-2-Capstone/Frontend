@@ -21,7 +21,7 @@ class MartMap extends StatelessWidget {
   Widget build(BuildContext context) {
     double pad = 20.w;
     return Dialog(
-      insetPadding: EdgeInsets.symmetric(vertical: 60.0.h, horizontal: 24.0.w),
+      insetPadding: EdgeInsets.symmetric(vertical: 90.0.h, horizontal: 24.0.w),
       child: Container(
         decoration: BoxDecoration(
           color: yellow_002,
@@ -71,6 +71,9 @@ class MartMap extends StatelessWidget {
                             fontWeight: FontWeight.w500,
                             fontSize: 24.h,
                           ),
+                        ),
+                        SizedBox(
+                          height: 25.w,
                         ),
                         Expanded(
                           child: Padding(
@@ -189,53 +192,6 @@ class MartMap extends StatelessWidget {
                                   ],
                                 ),
                               ),
-                            ),
-                          ),
-                        ),
-                        Padding(
-                          padding: EdgeInsets.only(top: 5.0.h, bottom: 10.0.h),
-                          child: TextButton(
-                            onPressed: () {
-                              Navigator.push<void>(
-                                context,
-                                MaterialPageRoute<void>(
-                                  builder: (BuildContext context) =>
-                                      const ArriveInfo(),
-                                ),
-                              );
-                            },
-                            style: ButtonStyle(
-                              shape: MaterialStateProperty.all(
-                                RoundedRectangleBorder(
-                                  borderRadius:
-                                      BorderRadius.circular(16.r), // 둥글게
-                                ),
-                              ),
-                              elevation:
-                                  MaterialStateProperty.resolveWith((states) {
-                                if (states.contains(MaterialState.pressed)) {
-                                  return 5.0; // 눌렀을 때 그림자 깊이
-                                }
-                                return 2.0; // 기본 그림자 깊이
-                              }),
-                              backgroundColor:
-                                  MaterialStateProperty.resolveWith((states) {
-                                if (states.contains(MaterialState.pressed)) {
-                                  return green_003; // 눌렀을 때 색상
-                                }
-                                return green_001; // 기본 색상
-                              }),
-                              foregroundColor:
-                                  MaterialStateProperty.resolveWith((states) {
-                                if (states.contains(MaterialState.pressed)) {
-                                  return green_001; // 눌렀을 때 색상
-                                }
-                                return Colors.black; // 기본 색상
-                              }),
-                            ),
-                            child: Text(
-                              '로봇과 함께 이동하기',
-                              style: TextStyle(fontSize: 18.w),
                             ),
                           ),
                         ),

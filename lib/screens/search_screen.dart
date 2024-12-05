@@ -33,6 +33,7 @@ class _SearchScreenState extends State<SearchScreen> {
 
   final NumberFormat currencyFormat = NumberFormat('#,###');
   List<Map<String, dynamic>> allResponse = []; // 전체 결과 저장
+  List<Map<String, dynamic>> searchResponse = []; // 전체 결과 저장
   Map<String, List<Map<String, dynamic>>> categoryResponses = {}; // 카테고리별 결과 저장
   String? selectedCategory; // 선택된 카테고리
   bool isLoading = true; // 로딩 상태
@@ -41,7 +42,7 @@ class _SearchScreenState extends State<SearchScreen> {
   // textfield
   final FocusNode _focusNode = FocusNode();
   final bool _isFocused = false;
-  String _counterText = "0";
+  final String _counterText = "0";
   TextEditingController textController = TextEditingController();
   String textContent = "";
   String errorTextVal = "";
@@ -114,6 +115,10 @@ class _SearchScreenState extends State<SearchScreen> {
   // 검색어로 상품을 필터링하여 데이터 가져오기
   Future<void> fetchGoodsBySearch(String keyword) async {
     final String baseUrl = "$back_url/goods/search/keyword";
+    setState(() {
+      isLoading = true;
+    });
+
     try {
       final Uri uri =
           Uri.parse(baseUrl).replace(queryParameters: {'keyword': keyword});
@@ -123,7 +128,7 @@ class _SearchScreenState extends State<SearchScreen> {
       if (response.statusCode == 200) {
         final String decodedBody = utf8.decode(response.bodyBytes);
         setState(() {
-          allResponse = List<Map<String, dynamic>>.from(
+          searchResponse = List<Map<String, dynamic>>.from(
               jsonDecode(decodedBody)['result']);
           print('update');
           isLoading = false; // 로딩 완료
@@ -154,6 +159,10 @@ class _SearchScreenState extends State<SearchScreen> {
 
   Future<void> fetchAllGoods() async {
     final String baseUrl = "$back_url/goods/search/all";
+
+    setState(() {
+      isLoading = true;
+    });
 
     try {
       final Uri uri = Uri.parse(baseUrl);
@@ -219,7 +228,7 @@ class _SearchScreenState extends State<SearchScreen> {
             padding: const EdgeInsets.only(top: 56), // 기본 AppBar 높이 고려
             child: isLoading
                 ? const Center(child: CustomLoadingIndicator())
-                : selectedCategory == null
+                : textContent.isNotEmpty
                     ? GridView.builder(
                         padding: const EdgeInsets.all(8.0),
                         gridDelegate:
@@ -229,9 +238,9 @@ class _SearchScreenState extends State<SearchScreen> {
                           mainAxisSpacing: 8.0,
                           childAspectRatio: 3 / 4,
                         ),
-                        itemCount: allResponse.length,
+                        itemCount: searchResponse.length,
                         itemBuilder: (context, index) {
-                          final item = allResponse[index];
+                          final item = searchResponse[index];
                           return CategoryItem(
                             imagePath: item['imageURL'] ?? ' ',
                             name: item['goods_name'],
@@ -239,27 +248,48 @@ class _SearchScreenState extends State<SearchScreen> {
                           );
                         },
                       )
-                    : GridView.builder(
-                        padding: const EdgeInsets.all(8.0),
-                        gridDelegate:
-                            const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 2,
-                          crossAxisSpacing: 8.0,
-                          mainAxisSpacing: 8.0,
-                          childAspectRatio: 3 / 4,
-                        ),
-                        itemCount:
-                            categoryResponses[selectedCategory]?.length ?? 0,
-                        itemBuilder: (context, index) {
-                          final item =
-                              categoryResponses[selectedCategory]![index];
-                          return CategoryItem(
-                            imagePath: item['imageURL'],
-                            name: item['goods_name'],
-                            price: item['goods_price'],
-                          );
-                        },
-                      ),
+                    : selectedCategory == null
+                        ? GridView.builder(
+                            padding: const EdgeInsets.all(8.0),
+                            gridDelegate:
+                                const SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 2,
+                              crossAxisSpacing: 8.0,
+                              mainAxisSpacing: 8.0,
+                              childAspectRatio: 3 / 4,
+                            ),
+                            itemCount: allResponse.length,
+                            itemBuilder: (context, index) {
+                              final item = allResponse[index];
+                              return CategoryItem(
+                                imagePath: item['imageURL'] ?? ' ',
+                                name: item['goods_name'],
+                                price: item['goods_price'],
+                              );
+                            },
+                          )
+                        : GridView.builder(
+                            padding: const EdgeInsets.all(8.0),
+                            gridDelegate:
+                                const SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 2,
+                              crossAxisSpacing: 8.0,
+                              mainAxisSpacing: 8.0,
+                              childAspectRatio: 3 / 4,
+                            ),
+                            itemCount:
+                                categoryResponses[selectedCategory]?.length ??
+                                    0,
+                            itemBuilder: (context, index) {
+                              final item =
+                                  categoryResponses[selectedCategory]![index];
+                              return CategoryItem(
+                                imagePath: item['imageURL'],
+                                name: item['goods_name'],
+                                price: item['goods_price'],
+                              );
+                            },
+                          ),
           ),
 
           // ExpansionTile
@@ -322,6 +352,7 @@ class _SearchScreenState extends State<SearchScreen> {
                           onSelected: (isSelected) {
                             setState(() {
                               selectedCategory = isSelected ? category : null;
+                              textContent = '';
                             });
                           },
                           showCheckmark: false,
@@ -385,6 +416,19 @@ class _SearchScreenState extends State<SearchScreen> {
         fontWeight: FontWeight.w400,
       ),
       decoration: InputDecoration(
+        suffixIcon: IconButton(
+          onPressed: () {
+            textController.clear();
+            setState(() {
+              textContent = '';
+              FocusScope.of(context).requestFocus(_focusNode); // 키보드 내리기
+            });
+          },
+          icon: Icon(
+            Icons.cancel,
+            color: gray_003,
+          ),
+        ),
         contentPadding: EdgeInsets.all(10.h),
         hintText: '검색어를 입력해주세요.',
         hintStyle: TextStyle(
@@ -420,18 +464,10 @@ class _SearchScreenState extends State<SearchScreen> {
       onTapOutside: (event) => FocusManager.instance.primaryFocus?.unfocus(),
       onChanged: (value) {
         setState(() {
-          _counterText = (value.length).toString();
           textContent = textController.text;
           _onSearchTextChanged(textContent); // 값 변경 될 때마다 호출
-          //textProvider.saveName(value);
-          if (value.isEmpty) {
-            errorTextVal = 'min';
-          } else {
-            errorTextVal = '';
-          }
         });
       },
-      cursorErrorColor: Colors.red,
     );
   }
 

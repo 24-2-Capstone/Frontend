@@ -64,7 +64,7 @@ class ArriveInfoSearch extends StatelessWidget {
                           height: 10.h,
                         ),
                         Text(
-                          '게속 대화하기',
+                          '게속 검색하기',
                           style: TextStyle(
                             color: brown_001,
                             fontSize: 20.h,
