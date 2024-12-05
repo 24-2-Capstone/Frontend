@@ -319,7 +319,7 @@ class _ChattingScreenState extends State<ChattingScreen> {
 
         // 채팅 메시지에 이미지 추가
         _messages.add(SenderImageBubble(
-            text: '이 사진과 같은 상품 찾아줘', image: _pickedImages.last));
+            text: '이 사진과 비슷한 상품 찾아줘', image: _pickedImages.last));
         _messages.add(const SizedBox(height: 14.0));
         _scrollToBottom(); // 서버 응답 메시지 추가 시 스크롤
       });
@@ -646,7 +646,7 @@ class _ChattingScreenState extends State<ChattingScreen> {
                             setState(() {
                               isfirstChoice = false;
                             });
-                            _pickImg();
+                            _isLoading ? null : _pickImg();
                           },
                         ),
                       ),
