@@ -125,14 +125,19 @@ class _MoreDetailButtonState extends State<MoreDetailButton> {
                                             ['discount_price'] = 0;
                                       });
                                     }
-                                    double discountRate = (100 -
-                                            widget.detailedList[index]
-                                                        ['discount_price']
-                                                    .toDouble() /
+                                    double discountRate = widget
+                                                    .detailedList[index]
+                                                ['discount_price'] ==
+                                            0
+                                        ? 0
+                                        : (100 -
                                                 widget.detailedList[index]
-                                                    ['original_price'] *
-                                                100)
-                                        .toDouble();
+                                                            ['discount_price']
+                                                        .toDouble() /
+                                                    widget.detailedList[index]
+                                                        ['original_price'] *
+                                                    100)
+                                            .toDouble();
 
                                     return GestureDetector(
                                       onTap: () {
@@ -177,8 +182,7 @@ class _MoreDetailButtonState extends State<MoreDetailButton> {
                                                 mainAxisAlignment:
                                                     MainAxisAlignment.center,
                                                 children: [
-                                                  if (discountRate != 0 ||
-                                                      discountRate != 100)
+                                                  if (discountRate != 0)
                                                     Text(
                                                       '${discountRate.toStringAsFixed(0)}% ',
                                                       style: TextStyle(
@@ -192,7 +196,9 @@ class _MoreDetailButtonState extends State<MoreDetailButton> {
                                                       ),
                                                     ),
                                                   Text(
-                                                    '${currencyFormat.format(widget.detailedList[index]['discount_price'])}원 ',
+                                                    discountRate == 0
+                                                        ? '${currencyFormat.format(widget.detailedList[index]['original_price'])}원 '
+                                                        : '${currencyFormat.format(widget.detailedList[index]['discount_price'])}원 ',
                                                     style: TextStyle(
                                                         color: brown_001,
                                                         fontSize: 15.w,
@@ -201,17 +207,18 @@ class _MoreDetailButtonState extends State<MoreDetailButton> {
                                                   ),
                                                 ],
                                               ),
-                                              Text(
-                                                '${currencyFormat.format(widget.detailedList[index]['original_price'])}원 ',
-                                                style: TextStyle(
-                                                    color:
-                                                        const Color(0xFF707070),
-                                                    decoration: TextDecoration
-                                                        .lineThrough,
-                                                    fontSize: 13.w,
-                                                    fontWeight:
-                                                        FontWeight.w400),
-                                              ),
+                                              if (discountRate != 0)
+                                                Text(
+                                                  '${currencyFormat.format(widget.detailedList[index]['original_price'])}원 ',
+                                                  style: TextStyle(
+                                                      color: const Color(
+                                                          0xFF707070),
+                                                      decoration: TextDecoration
+                                                          .lineThrough,
+                                                      fontSize: 13.w,
+                                                      fontWeight:
+                                                          FontWeight.w400),
+                                                ),
                                             ],
                                           ),
                                         ],
