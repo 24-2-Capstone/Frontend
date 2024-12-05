@@ -8,7 +8,6 @@ import 'package:foofi/screens/custom_loading_indicator.dart';
 import 'package:foofi/screens/home_screen.dart';
 import 'package:foofi/screens/overlay1_screen.dart';
 import 'package:foofi/screens/search_screen.dart';
-import 'package:foofi/screens/test_another.dart';
 import 'package:foofi/screens/chatting_screen.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
