@@ -145,12 +145,15 @@ Future<dynamic> showGoodsDialog(BuildContext context, String name) {
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.center,
                                   children: [
-                                    ClipRRect(
-                                      borderRadius:
-                                          BorderRadius.circular(5.0.r),
-                                      child: Image.network(
-                                        response['imageURL'],
-                                        height: 198.h,
+                                    Hero(
+                                      tag: 'pic',
+                                      child: ClipRRect(
+                                        borderRadius:
+                                            BorderRadius.circular(5.0.r),
+                                        child: Image.network(
+                                          response['imageURL'],
+                                          height: 198.h,
+                                        ),
                                       ),
                                     ),
                                     Container(

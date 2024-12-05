@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -86,7 +87,7 @@ class _MoreDetailButtonState extends State<MoreDetailButton> {
                               height: 34.w,
                             ),
                             Text(
-                              '상품',
+                              '추천 상품',
                               style: TextStyle(
                                 color: Colors.black,
                                 fontSize: 20.0.h,
@@ -150,13 +151,16 @@ class _MoreDetailButtonState extends State<MoreDetailButton> {
                                         crossAxisAlignment:
                                             CrossAxisAlignment.center,
                                         children: [
-                                          ClipRRect(
-                                            borderRadius:
-                                                BorderRadius.circular(5.0.r),
-                                            child: Image.network(
-                                              widget.detailedList[index]
-                                                  ['image_url'],
-                                              height: 128.h,
+                                          Hero(
+                                            tag: 'pic',
+                                            child: ClipRRect(
+                                              borderRadius:
+                                                  BorderRadius.circular(5.0.r),
+                                              child: Image.network(
+                                                widget.detailedList[index]
+                                                    ['image_url'],
+                                                height: 128.h,
+                                              ),
                                             ),
                                           ),
                                           Padding(
