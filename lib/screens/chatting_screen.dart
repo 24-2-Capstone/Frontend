@@ -6,6 +6,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_sound/flutter_sound.dart';
 import 'package:foofi/bubbles/receiver_image_bubble.dart';
 import 'package:foofi/bubbles/receiver_loading_bubble.dart';
+import 'package:foofi/bubbles/receiver_map_bubble.dart';
 import 'package:foofi/bubbles/receiver_text_bubble.dart';
 import 'package:foofi/bubbles/sender_image_bubble.dart';
 import 'package:foofi/bubbles/sender_text_bubble.dart';
