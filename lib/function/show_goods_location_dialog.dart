@@ -279,30 +279,52 @@ Future<dynamic> showGoodsLocationDialog(
                           ),
                         ),
                         Padding(
-                          padding: EdgeInsets.only(top: 0.0.h, bottom: 15.0.h),
-                          child: Container(
-                            decoration: BoxDecoration(
-                              color: green_001,
-                              borderRadius: BorderRadius.circular(16.0.r),
-                            ),
-                            child: TextButton(
-                              child: Text(
-                                '로봇과 함께 이동하기',
-                                style: TextStyle(
-                                    color: Colors.black, fontSize: 18.w),
+                          padding: EdgeInsets.only(top: 5.0.h, bottom: 10.0.h),
+                          child: TextButton(
+                            onPressed: () {
+                              Navigator.push<void>(
+                                context,
+                                MaterialPageRoute<void>(
+                                  builder: (BuildContext context) =>
+                                      const ArriveInfo(),
+                                ),
+                              );
+                            },
+                            style: ButtonStyle(
+                              shape: MaterialStateProperty.all(
+                                RoundedRectangleBorder(
+                                  borderRadius:
+                                      BorderRadius.circular(16.r), // 둥글게
+                                ),
                               ),
-                              onPressed: () {
-                                Navigator.push<void>(
-                                  context,
-                                  MaterialPageRoute<void>(
-                                    builder: (BuildContext context) =>
-                                        const ArriveInfo(),
-                                  ),
-                                );
-                              },
+                              elevation:
+                                  MaterialStateProperty.resolveWith((states) {
+                                if (states.contains(MaterialState.pressed)) {
+                                  return 5.0; // 눌렀을 때 그림자 깊이
+                                }
+                                return 2.0; // 기본 그림자 깊이
+                              }),
+                              backgroundColor:
+                                  MaterialStateProperty.resolveWith((states) {
+                                if (states.contains(MaterialState.pressed)) {
+                                  return green_003; // 눌렀을 때 색상
+                                }
+                                return green_001; // 기본 색상
+                              }),
+                              foregroundColor:
+                                  MaterialStateProperty.resolveWith((states) {
+                                if (states.contains(MaterialState.pressed)) {
+                                  return green_001; // 눌렀을 때 색상
+                                }
+                                return Colors.black; // 기본 색상
+                              }),
+                            ),
+                            child: Text(
+                              '로봇과 함께 이동하기',
+                              style: TextStyle(fontSize: 18.w),
                             ),
                           ),
-                        )
+                        ),
                       ],
                     ),
                   ],

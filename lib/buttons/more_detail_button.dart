@@ -109,7 +109,7 @@ class _MoreDetailButtonState extends State<MoreDetailButton> {
                                     crossAxisCount: 2,
                                     crossAxisSpacing: 15.w,
                                     mainAxisSpacing: 15.h,
-                                    childAspectRatio: 1 / 1.5,
+                                    childAspectRatio: 1 / 1.6,
                                   ),
                                   itemCount: widget.detailedList.length,
                                   itemBuilder:
@@ -160,7 +160,7 @@ class _MoreDetailButtonState extends State<MoreDetailButton> {
                                               textAlign: TextAlign.center,
                                               style: TextStyle(
                                                 color: Colors.black,
-                                                fontSize: 11.h,
+                                                fontSize: 13.h,
                                                 fontWeight: FontWeight.w400,
                                               ),
                                               overflow: TextOverflow

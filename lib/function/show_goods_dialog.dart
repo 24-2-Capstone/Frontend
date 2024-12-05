@@ -228,29 +228,50 @@ Future<dynamic> showGoodsDialog(BuildContext context, String name) {
                           ),
                         ),
                         Padding(
-                          padding:
-                              const EdgeInsets.only(top: 10.0, bottom: 10.0),
-                          child: Container(
-                            decoration: BoxDecoration(
-                              color: green_001,
-                              borderRadius: BorderRadius.circular(16.0.r),
-                            ),
-                            child: TextButton(
-                              child: Text(
-                                '찾으러 가기',
-                                style: TextStyle(
-                                    color: Colors.black, fontSize: 18.w),
+                          padding: EdgeInsets.only(top: 5.0.h, bottom: 10.0.h),
+                          child: TextButton(
+                            onPressed: () {
+                              showGoodsLocationDialog(
+                                context,
+                                response['id'],
+                                name,
+                              );
+                            },
+                            style: ButtonStyle(
+                              shape: MaterialStateProperty.all(
+                                RoundedRectangleBorder(
+                                  borderRadius:
+                                      BorderRadius.circular(16.r), // 둥글게
+                                ),
                               ),
-                              onPressed: () {
-                                showGoodsLocationDialog(
-                                  context,
-                                  response['id'],
-                                  name,
-                                );
-                              },
+                              elevation:
+                                  MaterialStateProperty.resolveWith((states) {
+                                if (states.contains(MaterialState.pressed)) {
+                                  return 5.0; // 눌렀을 때 그림자 깊이
+                                }
+                                return 2.0; // 기본 그림자 깊이
+                              }),
+                              backgroundColor:
+                                  MaterialStateProperty.resolveWith((states) {
+                                if (states.contains(MaterialState.pressed)) {
+                                  return green_003; // 눌렀을 때 색상
+                                }
+                                return green_001; // 기본 색상
+                              }),
+                              foregroundColor:
+                                  MaterialStateProperty.resolveWith((states) {
+                                if (states.contains(MaterialState.pressed)) {
+                                  return green_001; // 눌렀을 때 색상
+                                }
+                                return Colors.black; // 기본 색상
+                              }),
+                            ),
+                            child: Text(
+                              '찾으러 가기',
+                              style: TextStyle(fontSize: 18.w),
                             ),
                           ),
-                        )
+                        ),
                       ],
                     ),
                   ],
