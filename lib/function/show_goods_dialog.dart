@@ -5,8 +5,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:foofi/color.dart';
+import 'package:foofi/function/show_goods_location_dialog.dart';
 import 'package:foofi/main.dart';
 import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
 
 /// 이름으로 상품 검색
 Future<Map<String, dynamic>> getRequestGoodsName(String name) async {
@@ -36,6 +38,8 @@ Future<Map<String, dynamic>> getRequestGoodsName(String name) async {
 }
 
 Future<dynamic> showGoodsDialog(BuildContext context, String name) {
+  final NumberFormat currencyFormat = NumberFormat('#,###');
+
   return showDialog(
     context: context,
     builder: (BuildContext context) {
@@ -180,8 +184,8 @@ Future<dynamic> showGoodsDialog(BuildContext context, String name) {
                                               ),
                                             TextSpan(
                                               text: discountRate == 0
-                                                  ? '${response['goods_price']}원 '
-                                                  : '${response['sale_price']}원 ',
+                                                  ? '${currencyFormat.format(response['goods_price'])}원 '
+                                                  : '${currencyFormat.format(response['sale_price'])}원 ',
                                               style: TextStyle(
                                                   color: brown_001,
                                                   fontSize: 20,
@@ -190,7 +194,7 @@ Future<dynamic> showGoodsDialog(BuildContext context, String name) {
                                             if (discountRate != 0)
                                               TextSpan(
                                                 text:
-                                                    '${response['goods_price']}원',
+                                                    '${currencyFormat.format(response['goods_price'])}원 ',
                                                 style: const TextStyle(
                                                     color: Color(0xFF707070),
                                                     decoration: TextDecoration
@@ -237,7 +241,13 @@ Future<dynamic> showGoodsDialog(BuildContext context, String name) {
                                 style: TextStyle(
                                     color: Colors.black, fontSize: 18.w),
                               ),
-                              onPressed: () {},
+                              onPressed: () {
+                                showGoodsLocationDialog(
+                                  context,
+                                  response['id'],
+                                  name,
+                                );
+                              },
                             ),
                           ),
                         )

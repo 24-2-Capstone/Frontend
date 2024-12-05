@@ -1,6 +1,9 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:foofi/color.dart';
+import 'package:foofi/screens/home_screen.dart';
 
 class ArriveInfo extends StatelessWidget {
   const ArriveInfo({super.key});
@@ -31,12 +34,28 @@ class ArriveInfo extends StatelessWidget {
                   children: [
                     Column(
                       children: [
-                        CircleAvatar(
-                          backgroundColor: green_001,
-                          radius: 50.w,
-                          child: Icon(
-                            Icons.history,
-                            size: 40.h,
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.pop(context);
+                            Navigator.pop(context);
+                            Navigator.pop(context);
+                            Navigator.pop(context);
+                          },
+                          child: Material(
+                            elevation: 3,
+                            shape: const CircleBorder(), // 원형으로 만들기
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color: green_001,
+                                shape: BoxShape.circle,
+                              ),
+                              padding: EdgeInsets.all(35.h),
+                              child: Icon(
+                                Icons.history,
+                                color: brown_001,
+                                size: 40.h,
+                              ),
+                            ),
                           ),
                         ),
                         SizedBox(
@@ -56,12 +75,32 @@ class ArriveInfo extends StatelessWidget {
                     ),
                     Column(
                       children: [
-                        CircleAvatar(
-                          backgroundColor: green_001,
-                          radius: 50.w,
-                          child: Icon(
-                            Icons.home_outlined,
-                            size: 40.h,
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.pushAndRemoveUntil(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) =>
+                                      const HomeScreen()), // 이동할 화면
+                              (Route<dynamic> route) => false, // 제거 조건
+                            );
+                          },
+                          child: Material(
+                            elevation: 3,
+
+                            shape: const CircleBorder(), // 원형으로 만들기
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color: green_001,
+                                shape: BoxShape.circle,
+                              ),
+                              padding: EdgeInsets.all(35.h),
+                              child: Icon(
+                                Icons.home_outlined,
+                                color: brown_001,
+                                size: 40.h,
+                              ),
+                            ),
                           ),
                         ),
                         SizedBox(

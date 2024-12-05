@@ -10,6 +10,7 @@ import 'package:foofi/screens/overlay1_screen.dart';
 import 'package:foofi/screens/search_screen.dart';
 import 'package:foofi/screens/test_another.dart';
 import 'package:foofi/screens/chatting_screen.dart';
+import 'package:webview_flutter/webview_flutter.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

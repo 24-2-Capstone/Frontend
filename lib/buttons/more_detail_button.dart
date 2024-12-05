@@ -27,7 +27,7 @@ class _MoreDetailButtonState extends State<MoreDetailButton> {
     // TODO: implement initState
     super.initState();
 
-    // 데이터 초기화
+    // 데이터 초기화 (null 값이면 0원 처리)
     for (var item in widget.detailedList) {
       item['discount_price'] ??= 0;
     }
@@ -106,7 +106,7 @@ class _MoreDetailButtonState extends State<MoreDetailButton> {
                                     crossAxisCount: 2,
                                     crossAxisSpacing: 15,
                                     mainAxisSpacing: 15,
-                                    childAspectRatio: 1 / 3,
+                                    childAspectRatio: 1 / 1.5,
                                   ),
                                   itemCount: widget.detailedList.length,
                                   itemBuilder:

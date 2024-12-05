@@ -18,6 +18,15 @@ class SearchScreen extends StatefulWidget {
 
 class _SearchScreenState extends State<SearchScreen> {
   List<String> categories = ['채소', '과일', '해산물', '정육', '잡곡', '양념'];
+  List<String> expansionCategories = [
+    "전체",
+    "채소",
+    "과일",
+    "해산물",
+    "정육",
+    "잡곡",
+    "양념"
+  ];
 
   final NumberFormat currencyFormat = NumberFormat('#,###');
   List<Map<String, dynamic>> allResponse = []; // 전체 결과 저장
@@ -220,168 +229,31 @@ class _SearchScreenState extends State<SearchScreen> {
                   child: Material(
                     elevation: 4.0, // 그림자 효과 추가
                     child: ExpansionTile(
-                      title: Row(
-                        children: [
-                          Column(
-                            children: [
-                              Text(
-                                "전체",
-                                style: TextStyle(
-                                  color: brown_001,
-                                  fontWeight: selectedCategory == "전체"
-                                      ? FontWeight.w600
-                                      : FontWeight.w400,
-                                  fontSize: 16,
-                                ),
+                      title: isExpanded
+                          ? Text(
+                              "전체",
+                              style: TextStyle(
+                                color: brown_001,
+                                fontWeight: selectedCategory == "전체"
+                                    ? FontWeight.w600
+                                    : FontWeight.w400,
+                                fontSize: 16,
                               ),
-                              if (selectedCategory == null)
-                                Container(
-                                  color: brown_001,
-                                  height: 4.h,
-                                  width: 30.w,
-                                ),
-                            ],
-                          ),
-                          SizedBox(
-                            width: 15.w,
-                          ),
-                          Column(
-                            children: [
-                              Text(
-                                "채소",
-                                style: TextStyle(
-                                  color: brown_001,
-                                  fontWeight: selectedCategory == "채소"
-                                      ? FontWeight.w600
-                                      : FontWeight.w400,
-                                  fontSize: 16,
-                                ),
+                            )
+                          : SingleChildScrollView(
+                              scrollDirection: Axis.horizontal, // 가로 스크롤 설정
+                              child: Wrap(
+                                spacing: 29.w, // 각 Column 간 간격
+                                children: [
+                                  for (var category in expansionCategories)
+                                    BuildCategory(
+                                      category: category,
+                                      selectedCategory:
+                                          selectedCategory ?? "전체",
+                                    ),
+                                ],
                               ),
-                              // if (selectedCategory == "채소")
-                              //   Container(
-                              //     color: brown_001,
-                              //     height: 4.h,
-                              //     width: 30.w,
-                              //   ),
-                            ],
-                          ),
-                          SizedBox(
-                            width: 15.w,
-                          ),
-                          Column(
-                            children: [
-                              Text(
-                                "과일",
-                                style: TextStyle(
-                                  color: brown_001,
-                                  fontWeight: selectedCategory == "과일"
-                                      ? FontWeight.w600
-                                      : FontWeight.w400,
-                                  fontSize: 16,
-                                ),
-                              ),
-                              if (selectedCategory == "과일")
-                                Container(
-                                  color: brown_001,
-                                  height: 4.h,
-                                  width: 30.w,
-                                ),
-                            ],
-                          ),
-                          SizedBox(
-                            width: 15.w,
-                          ),
-                          Column(
-                            children: [
-                              Text(
-                                "해산물",
-                                style: TextStyle(
-                                  color: brown_001,
-                                  fontWeight: selectedCategory == "해산물"
-                                      ? FontWeight.w600
-                                      : FontWeight.w400,
-                                  fontSize: 16,
-                                ),
-                              ),
-                              if (selectedCategory == "해산물")
-                                Container(
-                                  color: brown_001,
-                                  height: 4.h,
-                                  width: 40.w,
-                                ),
-                            ],
-                          ),
-                          SizedBox(
-                            width: 15.w,
-                          ),
-                          Column(
-                            children: [
-                              Text(
-                                "정육",
-                                style: TextStyle(
-                                  color: brown_001,
-                                  fontWeight: selectedCategory == "정육"
-                                      ? FontWeight.w600
-                                      : FontWeight.w400,
-                                  fontSize: 16,
-                                ),
-                              ),
-                              if (selectedCategory == "정육")
-                                Container(
-                                  color: brown_001,
-                                  height: 4.h,
-                                  width: 30.w,
-                                ),
-                            ],
-                          ),
-                          SizedBox(
-                            width: 15.w,
-                          ),
-                          Column(
-                            children: [
-                              Text(
-                                "잡곡",
-                                style: TextStyle(
-                                  color: brown_001,
-                                  fontWeight: selectedCategory == "잡곡"
-                                      ? FontWeight.w600
-                                      : FontWeight.w400,
-                                  fontSize: 16,
-                                ),
-                              ),
-                              if (selectedCategory == "잡곡")
-                                Container(
-                                  color: brown_001,
-                                  height: 4.h,
-                                  width: 30.w,
-                                ),
-                            ],
-                          ),
-                          SizedBox(
-                            width: 15.w,
-                          ),
-                          Column(
-                            children: [
-                              Text(
-                                "양념",
-                                style: TextStyle(
-                                  color: brown_001,
-                                  fontWeight: selectedCategory == "양념"
-                                      ? FontWeight.w600
-                                      : FontWeight.w400,
-                                  fontSize: 16,
-                                ),
-                              ),
-                              if (selectedCategory == "양념")
-                                Container(
-                                  color: brown_001,
-                                  height: 4.h,
-                                  width: 30.w,
-                                ),
-                            ],
-                          ),
-                        ],
-                      ),
+                            ),
                       shape: const Border.symmetric(
                           horizontal: BorderSide(
                         color: Color(0xFFBBA998),
@@ -577,6 +449,41 @@ class CategoryItem extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+class BuildCategory extends StatelessWidget {
+  BuildCategory({
+    super.key,
+    required this.category,
+    required this.selectedCategory,
+  });
+
+  String category;
+  String selectedCategory;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Text(
+          category,
+          style: TextStyle(
+            color: brown_001,
+            fontWeight: selectedCategory == category
+                ? FontWeight.w600
+                : FontWeight.w400,
+            fontSize: 16,
+          ),
+        ),
+        if (selectedCategory == category)
+          Container(
+            color: brown_001,
+            height: 4.h,
+            width: category == "해산물" ? 40.w : 30.w, // "해산물"의 너비를 다르게 설정
+          ),
+      ],
     );
   }
 }
