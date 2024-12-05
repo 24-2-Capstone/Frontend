@@ -159,18 +159,23 @@ Future<dynamic> showGoodsLocationDialog(
                                           height: 440.h,
                                           alignment: const Alignment(0, 0),
                                           color: Colors.transparent,
-                                          child: Container(
-                                            color: yellow_001,
-                                            child: CustomPaint(
-                                              size:
-                                                  Size(200.w, 400.h), // 캔버스 크기
-                                              painter: MapPainter(
-                                                [
-                                                  Offset(
-                                                      response['x'].toDouble(),
-                                                      response['y']
-                                                          .toDouble()), // 좌표 1
-                                                ],
+                                          child: ClipRRect(
+                                            borderRadius:
+                                                BorderRadius.circular(15.r),
+                                            child: Container(
+                                              color: yellow_001,
+                                              child: CustomPaint(
+                                                size: Size(
+                                                    200.w, 400.h), // 캔버스 크기
+                                                painter: MapPainter(
+                                                  [
+                                                    Offset(
+                                                        response['x']
+                                                            .toDouble(),
+                                                        response['y']
+                                                            .toDouble()), // 좌표 1
+                                                  ],
+                                                ),
                                               ),
                                             ),
                                           ),
