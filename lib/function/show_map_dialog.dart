@@ -1,16 +1,7 @@
-import 'dart:convert';
-
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:foofi/color.dart';
-import 'package:foofi/main.dart';
-import 'package:foofi/screens/arrive_info.dart';
-import 'package:foofi/screens/arrive_infot_search.dart';
 import 'package:foofi/screens/map_painter.dart';
-import 'package:nice_ripple/nice_ripple.dart';
 
 class MartMap extends StatelessWidget {
   const MartMap({

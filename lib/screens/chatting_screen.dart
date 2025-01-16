@@ -1,18 +1,16 @@
 import 'dart:io';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_sound/flutter_sound.dart';
 import 'package:foofi/bubbles/receiver_cashier_map_bubble.dart';
 import 'package:foofi/bubbles/receiver_image_bubble.dart';
+import 'package:foofi/bubbles/receiver_image_bubble_one.dart';
 import 'package:foofi/bubbles/receiver_loading_bubble.dart';
-import 'package:foofi/bubbles/receiver_map_bubble.dart';
 import 'package:foofi/bubbles/receiver_text_bubble.dart';
 import 'package:foofi/bubbles/sender_image_bubble.dart';
 import 'package:foofi/bubbles/sender_text_bubble.dart';
 import 'package:foofi/buttons/choice_button.dart';
-import 'package:foofi/buttons/speak_button.dart';
 import 'package:foofi/color.dart';
 import 'package:foofi/function/perform_tts.dart';
 import 'package:foofi/main.dart';
@@ -405,6 +403,7 @@ class _ChattingScreenState extends State<ChattingScreen> {
             _messages.add(SizedBox(height: 14.0.h));
             _scrollToBottom();
           });
+          return;
         }
 
         setState(() {
@@ -421,6 +420,17 @@ class _ChattingScreenState extends State<ChattingScreen> {
 
           if (detailedResults.isEmpty) {
             _messages.add(ReceiverTextBubble(text: reply));
+            _messages.add(SizedBox(height: 14.0.h));
+          } else if (detailedResults.length == 1 ||
+              detailedResults.length == 2) {
+            _messages.add(ReceiverImageBubbleOne(
+              text: reply,
+              name: detailedResults[0]['product_name'],
+              imageUrl: detailedResults[0]['image_url'],
+              originalPrice: detailedResults[0]['original_price'] ?? 0,
+              discountPrice: detailedResults[0]['discount_price'] ?? 0,
+              detailedList: responseData["detailed_results"],
+            ));
             _messages.add(SizedBox(height: 14.0.h));
           } else {
             _messages.add(ReceiverImageBubble(

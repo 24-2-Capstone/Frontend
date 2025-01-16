@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:foofi/buttons/speak_button.dart';
-import 'package:foofi/color.dart';
 
 class OverlayScreen2 extends StatefulWidget {
   const OverlayScreen2({super.key});

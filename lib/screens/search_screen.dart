@@ -1,8 +1,5 @@
 import 'dart:convert';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
-import 'package:flutter_floaty/flutter_floaty.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:foofi/color.dart';
 import 'package:foofi/function/show_goods_dialog.dart';
@@ -11,7 +8,6 @@ import 'package:foofi/main.dart';
 import 'package:foofi/screens/custom_loading_indicator.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 
 class SearchScreen extends StatefulWidget {
   const SearchScreen({super.key});
